@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    background-color: rgb(232, 232, 232);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+::-webkit-scrollbar {
+    width: 0;
+    background-color: transparent;
+}
+
+::-moz-scrollbar {
+    width: 0;
+    background-color: transparent;
+}
+
+::-ms-scrollbar {
+    width: 0;
+    background-color: transparent;
+}
