@@ -1,9 +1,9 @@
-import "../styles/tempTicketScreen.css";
+import "../../styles/tempTicketScreen.css";
 import InputLabel from "@mui/material/InputLabel";
 import FormHelperText from "@mui/material/FormHelperText";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 
 interface PropsType {
   itinerary: {
@@ -15,8 +15,8 @@ interface PropsType {
     DeptDate: string;
     ArrDate: string;
   };
-  selectedSeat: number | null;
   initPrice: number;
+  selectedSeat: number | null;
   ticketPrice: string;
   setTicketPrice: (string: string) => void;
   isSelected: boolean;
@@ -24,7 +24,8 @@ interface PropsType {
 }
 
 const SeatTicketDetails = (props: PropsType) => {
-  const handleChange = (event: SelectChangeEvent) => {
+  
+  const handleChange = (event: any) => {
     props.setTicketPrice(event.target.value as string);
   };
 

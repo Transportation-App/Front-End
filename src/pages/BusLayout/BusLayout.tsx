@@ -1,11 +1,11 @@
 
-import "../styles/tempTicketScreen.css";
-import { seatType } from "../data";
+import "../../styles/tempTicketScreen.css";
+import { SeatType } from "../../types/SeatType";
 import Button from "./UI/Button";
-import React, { useState } from "react";
+import { useState } from "react";
 
 interface PropsType {
-  seats: seatType[];
+  seats: SeatType[];
   selectedSeat: number | null;
   onClick: (number: number) => void;
 }

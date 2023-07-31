@@ -1,28 +1,7 @@
-export type itineraryType = {
-  DeptHour: string;
-  ArrHour: string;
-  Duration: number;
-  DeptCity: string;
-  ArrCity: string;
-  DeptDate: string;
-  ArrDate: string;
-  initPrice: number;
-  bus: busType;
-};
-
-export type seatType = {
-  number: number;
-  // type: string;
-  isRes: boolean;
-};
-
-export type busType = {
-  seats: seatType[];
-  type: string;
-};
+import { TicketType } from "../types/TicketType";
 
 export type dataType = {
-  itinerary: itineraryType;
+  itinerary: TicketType;
 };
 
 const dummy: dataType = {

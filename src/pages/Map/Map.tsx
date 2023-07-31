@@ -1,5 +1,4 @@
 import "../../styles/tempTicketScreen.css";
-import React from 'react';
 // import GoogleMapReact from '../../node_modules/google-map-react';
 
 const Map = () => {
