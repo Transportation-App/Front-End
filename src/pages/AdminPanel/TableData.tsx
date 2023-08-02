@@ -11,8 +11,9 @@ import en from "../../locales/en/common.json";
 import { GridColTypeDef } from "@mui/x-data-grid";
 import GloballyCustomizedOptions from "./AutoComplete";
 import ChangeLang from "./LanguageChange";
-import { Paper } from "@mui/material";
+import { Alert, Paper, Snackbar} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import DarkThemButton from "./DarkThemeButton";
 
 import {
   GridRowsProp,
@@ -300,8 +301,24 @@ export default function FullFeaturedCrudGrid() {
     },
   ];
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+
   return (
-    <Paper style={{ maxHeight: 800, overflow: "auto" }}>
+    <Paper  style={{ maxHeight: 800, overflow: "auto" }}>
+      {/* sx={{backgroundColor:'dimgray'}} */}
       <DataGrid
         rows={rows}
         columns={columns}
@@ -317,9 +334,15 @@ export default function FullFeaturedCrudGrid() {
           toolbar: { setRows, setRowModesModel, handleLanguageSwitch, locale },
         }}
       />
-      <Button style={{width:'100%'}}  endIcon={<SendIcon />}>
-        Send
+      <Button  endIcon={<SendIcon/>} onClick={handleClick} sx={{ width: "100%" }}>
+        Sent
       </Button>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+          This is a success message!
+        </Alert>
+      </Snackbar>
+      {/* <DarkThemButton/>  Still in progress*/}
     </Paper>
   );
 }
