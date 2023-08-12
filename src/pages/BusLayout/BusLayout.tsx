@@ -1,4 +1,3 @@
-
 import "../../styles/tempTicketScreen.css";
 import { SeatType } from "../../types/SeatType";
 import Button from "./UI/Button";
@@ -59,8 +58,8 @@ const BusLayout = (props: PropsType) => {
         <div key={Math.random()} className="row">
           {i == Math.floor(rows / 4) ? (
             <>
-              <div key={Math.random()} className="aisle"></div>
-              <div key={Math.random()} className="aisle"></div>
+              <div key={Math.random()} className="aisle-door"></div>
+              <div key={Math.random()} className="aisle-door"></div>
             </>
           ) : (
             createSeats()
@@ -88,12 +87,7 @@ const BusLayout = (props: PropsType) => {
     return tempRows;
   };
 
-  return (
-    <div
-      className="bus-layout">
-      {createRows()}
-    </div>
-  );
+  return <div className="bus-layout">{createRows()}</div>;
 };
 
 export default BusLayout;

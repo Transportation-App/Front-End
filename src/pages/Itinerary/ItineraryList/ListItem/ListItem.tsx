@@ -4,11 +4,12 @@ import { HourType } from "../../../../types/HourType";
 import { StationType } from "../../../../types/StationType";
 import ItineraryInfo from "../../ItineraryInfo/ItineraryInfo";
 import ItineraryDescription from "../../ItineraryDescription/ItineraryDescription";
-  
-interface PropsType  {
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+
+interface PropsType {
   className?: string;
   itinerary: ItineraryType;
-};
+}
 
 const ListItem = (props: PropsType) => {
   const [reveal, setReveal] = useState(false);
@@ -61,17 +62,13 @@ const ListItem = (props: PropsType) => {
   return (
     <li className={props.className}>
       <div className="w-full h-24 mt-10 mb-2 flex justify-center items-center bg-white border-transparent rounded-lg shadow-md">
-        <img
-          // src={expand_more_svg}
-          alt="expand_more"
-          width={32}
-          height={32}
+        <ArrowRightIcon
+          onClick={handleRotate}
           className={`pointer ${
             reveal
-              ? "rotate-180 duration-100 ease-in-out"
+              ? "rotate-90 duration-100 ease-in-out"
               : "duration-100 ease-in-out"
           }`}
-          onClick={handleRotate}
         />
         <ItineraryInfo
           className="w-[90%] flex justify-evenly items-center text-center"
@@ -91,6 +88,6 @@ const ListItem = (props: PropsType) => {
       />
     </li>
   );
-}
+};
 
-export default ListItem
+export default ListItem;

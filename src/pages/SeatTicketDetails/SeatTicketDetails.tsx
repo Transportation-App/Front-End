@@ -1,7 +1,7 @@
 import "../../styles/tempTicketScreen.css";
 import InputLabel from "@mui/material/InputLabel";
 import FormHelperText from "@mui/material/FormHelperText";
-import MenuItem from "@mui/material/MenuItem";
+import { Button, List, ListItem, MenuItem } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
@@ -24,7 +24,6 @@ interface PropsType {
 }
 
 const SeatTicketDetails = (props: PropsType) => {
-  
   const handleChange = (event: any) => {
     props.setTicketPrice(event.target.value as string);
   };
@@ -35,66 +34,64 @@ const SeatTicketDetails = (props: PropsType) => {
 
   return (
     <div className="seat-ticket-details">
-      <ul className="list-headers">
-        <li>
+      <List className="list-headers">
+        <ListItem disablePadding>
           <b>Dept. Hour</b>
           <p>{props.itinerary.DeptHour}</p>
-        </li>
-        <li>
+        </ListItem>
+        <ListItem disablePadding>
           <b>Arr. Hour</b>
           <p>{props.itinerary.ArrHour}</p>
-        </li>
-        <li>
+        </ListItem>
+        <ListItem disablePadding>
           <b>Duration</b>
           <p>{props.itinerary.Duration}</p>
-        </li>
-        <li>
+        </ListItem>
+        <ListItem disablePadding>
           <b>Dept. City</b>
           <p>{props.itinerary.DeptCity}</p>
-        </li>
-        <li>
+        </ListItem>
+        <ListItem disablePadding>
           <b>Arr. City</b>
           <p>{props.itinerary.ArrCity}</p>
-        </li>
-        <li>
+        </ListItem>
+        <ListItem disablePadding>
           <b>Dept. Date</b>
           <p>{props.itinerary.DeptDate}</p>
-        </li>
-        <li>
+        </ListItem>
+        <ListItem disablePadding>
           <b>Arr. Date</b>
           <p>{props.itinerary.ArrDate}</p>
-        </li>
-      </ul>
+        </ListItem>
+      </List>
       {!props.isSelected ? (
-        <div></div>
+        <b>Επίλεξε μία θέση!</b>
       ) : (
-        <div className="content-container">
-          <FormControl sx={{ m: 2, minWidth: 120 }}>
-            <InputLabel id="demo-simple-select-label">
-              Επίλεξε εισιτήριο
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={props.ticketPrice}
-              label="Επίλεξε εισιτήριο"
-              onChange={handleChange}
-            >
-              <MenuItem value={props.initPrice}>{"Κανονικό "}</MenuItem>
-              <MenuItem value={(props.initPrice * 75) / 100}>
-                {"Μειωμένο(μαθητικά,πολύτεκνοι) -25%"}
-              </MenuItem>
-              <MenuItem value={(props.initPrice * 50) / 100}>
-                {"Φοιτητικό -50%"}
-              </MenuItem>
-            </Select>
-            <FormHelperText>
-              Επίλεξε το εισιτήριό σου και την κατάλληλη έκπτωση
-            </FormHelperText>
-          </FormControl>
+        <FormControl sx={{ m: 2, minWidth: 120 }}>
+          <InputLabel id="demo-simple-select-label">
+            Επίλεξε εισιτήριο
+          </InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={props.ticketPrice}
+            label="Επίλεξε εισιτήριο"
+            onChange={handleChange}
+          >
+            <MenuItem value={props.initPrice}>{"Κανονικό "}</MenuItem>
+            <MenuItem value={(props.initPrice * 75) / 100}>
+              {"Μειωμένο(μαθητικά,πολύτεκνοι) -25%"}
+            </MenuItem>
+            <MenuItem value={(props.initPrice * 50) / 100}>
+              {"Φοιτητικό -50%"}
+            </MenuItem>
+          </Select>
+          <FormHelperText>
+            Επίλεξε το εισιτήριό σου και την κατάλληλη έκπτωση
+          </FormHelperText>
 
           {!isNaN(parseFloat(props.ticketPrice)) && (
-            <p style={{ fontSize: "19px" }}>
+            <p style={{ fontSize: "18px", marginBottom: "10px" }}>
               {"Total price: " +
                 parseFloat(props.ticketPrice).toFixed(2) +
                 "$" +
@@ -102,17 +99,17 @@ const SeatTicketDetails = (props: PropsType) => {
                 props.selectedSeat}
             </p>
           )}
-        </div>
+        </FormControl>
       )}
-      <div className="btn-container">
-        <button
-          className="submit-btn"
-          disabled={!props.isSelected || props.ticketPrice === ""}
-          onClick={onClickHandler}
-        >
-          Book your seat!
-        </button>
-      </div>
+      <Button
+        variant="contained"
+        className="submit-btn"
+        sx={[{ marginBottom: "10px" }]}
+        disabled={!props.isSelected || props.ticketPrice === ""}
+        onClick={onClickHandler}
+      >
+        {"Book your seat!"}
+      </Button>
     </div>
   );
 };

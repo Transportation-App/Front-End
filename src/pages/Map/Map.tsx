@@ -11,13 +11,15 @@ const Map = () => {
     lat: number;
     lng: number;
   }
-  
+
   const Marker = ({ lat, lng }: MarkerProps) => (
-    <div className="marker" style={{ position: 'absolute', left: lng, top: lat }}>
+    <div
+      className="marker"
+      style={{ position: "absolute", left: lng, top: lat }}
+    >
       <i className="fas fa-map-marker-alt"></i>
     </div>
   );
-  
 
   return (
     <div className="map">
@@ -28,6 +30,7 @@ const Map = () => {
         <Marker lat={pathCoordinates[0].lat} lng={pathCoordinates[0].lng} />
         <Marker lat={pathCoordinates[1].lat} lng={pathCoordinates[1].lng} />
       </GoogleMapReact> */}
+      hello
     </div>
   );
 };
