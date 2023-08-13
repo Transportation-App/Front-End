@@ -29,7 +29,7 @@ const TicketScreen = () => {
         ticketPrice
       ).toFixed(2)}$\nYour seat is: ${selectedSeat}`
     );
-    navigate("/");
+    navigate("/Home");
 
     if (selectedSeat) {
       const updatedSeats = [...seats];

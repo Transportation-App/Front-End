@@ -5,12 +5,15 @@ import ItineraryList from "./pages/Itinerary/ItineraryList/ItineraryList";
 import AdminPanel from "./pages/AdminPanel/TableData";
 import TicketScreen from "./pages/TicketScreen/TicketScreen";
 import PaymentScreen from "./pages/PaymentInfo/PaymentInfo";
-
-// import TicketScreen from "./pages/TicketScreen/TicketScreen";
+import LoginPage from "./pages/LoginPage/LoginPage";
 
 const router = createBrowserRouter([
   {
-    path: "",
+    path: "/",
+    element: <LoginPage />,
+  },
+  {
+    path: "Home",
     element: (
       <ItineraryList
         className="w-[80%] h-full overflow-y-auto"
@@ -33,15 +36,7 @@ const router = createBrowserRouter([
 ]);
 
 const ItineraryPage = () => {
-  return (
-    <RouterProvider router={router} />
-    // <AdminPanel />
-    // <ItineraryList
-    //   className="w-[80%] h-full overflow-y-auto"
-    //   itineraries={itineraryData}
-    // />
-    // <TicketScreen />
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default ItineraryPage;
