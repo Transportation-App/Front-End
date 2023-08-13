@@ -1,7 +1,20 @@
 import "../../styles/tempTicketScreen.css";
 import InputLabel from "@mui/material/InputLabel";
 import FormHelperText from "@mui/material/FormHelperText";
-import { Button, List, ListItem, MenuItem } from "@mui/material";
+import {
+  Button,
+  Divider,
+  List,
+  ListItem,
+  MenuItem,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
@@ -34,7 +47,7 @@ const SeatTicketDetails = (props: PropsType) => {
 
   return (
     <div className="seat-ticket-details">
-      <List className="list-headers">
+      {/* <List className="list-headers">
         <ListItem disablePadding>
           <b>Dept. Hour</b>
           <p>{props.itinerary.DeptHour}</p>
@@ -43,27 +56,79 @@ const SeatTicketDetails = (props: PropsType) => {
           <b>Arr. Hour</b>
           <p>{props.itinerary.ArrHour}</p>
         </ListItem>
+
         <ListItem disablePadding>
           <b>Duration</b>
           <p>{props.itinerary.Duration}</p>
         </ListItem>
+
         <ListItem disablePadding>
           <b>Dept. City</b>
+          <hr />
           <p>{props.itinerary.DeptCity}</p>
         </ListItem>
         <ListItem disablePadding>
           <b>Arr. City</b>
           <p>{props.itinerary.ArrCity}</p>
         </ListItem>
+        <Divider />
+
         <ListItem disablePadding>
           <b>Dept. Date</b>
           <p>{props.itinerary.DeptDate}</p>
         </ListItem>
+        <Divider />
+
         <ListItem disablePadding>
           <b>Arr. Date</b>
           <p>{props.itinerary.ArrDate}</p>
         </ListItem>
-      </List>
+      </List> */}
+      <TableContainer component={Paper} sx={{ backgroundColor: "inherit" }}>
+        <Table aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">
+                <b>Dept. Hour</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Arr. Hour</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Duration</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Dept. City</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Arr. City</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Dept. Date</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Arr. Date</b>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow
+              key={0}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+              <TableCell component="th" scope="row" align="center">
+                {props.itinerary.DeptHour}
+              </TableCell>
+              <TableCell align="center">{props.itinerary.ArrHour}</TableCell>
+              <TableCell align="center">{props.itinerary.Duration}</TableCell>
+              <TableCell align="center">{props.itinerary.DeptCity}</TableCell>
+              <TableCell align="center">{props.itinerary.ArrCity}</TableCell>
+              <TableCell align="center">{props.itinerary.DeptDate}</TableCell>
+              <TableCell align="center">{props.itinerary.ArrDate}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
       {!props.isSelected ? (
         <b>Επίλεξε μία θέση!</b>
       ) : (

@@ -28,6 +28,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .seat {
@@ -98,7 +99,9 @@
 }
 
 .list-headers li {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   padding: 5px 15px;
   text-align: center;
 }
@@ -112,38 +115,109 @@
 
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 1080px) {
   
   .MainContainer {
     display: flex;
-    flex-direction: column;
     height: 100%;
-  }
-  
-  .ticketMap {
+    margin-right: auto;
     width: 100%;
   }
   
+  .ticketMap {
+    width: 65%;
+  }
+  
   .seat-ticket-details {
-    height: 45vh;
+    height: 100%;
+  }
+
+  .list-headers {
+    font-size: 10px;
   }
 
   .map {
-    height: 30vh;
+    height: 100%;
   }
 
   .bus-layout {
-    /* height: 100vh; */
+    width: 35%;
+  }
+}
+
+@media only screen and (max-width: 880px){
+  .MainContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .list-headers {
+    font-size: 12px;
+  }
+
+  .bus-layout {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+
+  }
+
+  .ticketMap {
+    width: 100%;
+
+  }
+
+  .seat-ticket-details {
+    height: 60vh;
+
+  }
+
+  .map {
+    height: 45vh;
+  }
+}
+
+@media only screen and (max-width: 720px) {
+  .MainContainer {
+    margin: auto;
+    width: 80%;
+    /* height: 100%; */
+  }
+
+  .seat-ticket-details {
+    width:  100%;
+  }
+  
+  .seat {
+    width: 10%
+  }
+
+  .aisle-door {
+    width: 10%;
+  }
+
+}
+
+@media only screen and (max-width: 520px) {
+  .MainContainer {
+    width: 55%  ;
+  }
+
+  .bus-layout {
+    width: 100%;
+  }
+
+  .ticketMap {
     width: 100%;
   }
 }
 
-@media only screen and (max-width: 900px){
+@media only screen and (max-width: 370px) {
   .MainContainer {
-    display: flex;
-    /* flex-direction: column; */
-    justify-content: center;
-    align-items: center;
-    width: 60%;
+    width: 40%;
   }
 }
