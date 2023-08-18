@@ -17,6 +17,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -26,15 +27,25 @@ const LoginPage = () => {
     event.preventDefault();
   };
 
-  const handleLogin = () => {
-    console.log("Logging in:", username);
+  const handleLogin = async () => {
+    try {
+      setIsLoading(true);
+      console.log("Logging in:", username);
 
-    navigate("/Admin");
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      navigate("/Admin");
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="login-form">
       <b>Hello Admin!</b>
+      <hr />
       <TextField
         id="outlined-basic"
         label="Username"
@@ -67,7 +78,7 @@ const LoginPage = () => {
         />
       </FormControl>
       <Button sx={{ p: 1.2 }} variant="contained" onClick={handleLogin}>
-        Login
+        {isLoading ? "Logging in..." : "Login"}
       </Button>
     </div>
   );
