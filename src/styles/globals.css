@@ -3,25 +3,33 @@
 @tailwind utilities;
 
 body {
-    background-color: rgb(255, 255, 255);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
+  background-color: rgb(255, 255, 255);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 ::-webkit-scrollbar {
-    width: 0;
-    background-color: transparent;
+  width: 0;
+  background-color: transparent;
 }
 
 ::-moz-scrollbar {
-    width: 0;
-    background-color: transparent;
+  width: 0;
+  background-color: transparent;
 }
 
 ::-ms-scrollbar {
-    width: 0;
-    background-color: transparent;
+  width: 0;
+  background-color: transparent;
 }

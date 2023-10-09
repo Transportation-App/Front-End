@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     path: "Home",
     element: (
       <ItineraryList
-        className="w-[80%] h-full overflow-y-auto"
+        className="w-[80%] overflow-y-auto"
         itineraries={itineraryData}
       />
     ),
