@@ -30,7 +30,6 @@ const LoginPage = () => {
   const handleLogin = async () => {
     try {
       setIsLoading(true);
-      console.log("Logging in:", username);
 
       await new Promise((resolve) => setTimeout(resolve, 100));
 

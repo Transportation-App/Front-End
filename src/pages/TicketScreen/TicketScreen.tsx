@@ -6,41 +6,56 @@ import BusLayout from "../BusLayout/BusLayout";
 import SeatTicketDetails from "../SeatTicketDetails/SeatTicketDetails";
 import Map from "../Map/Map";
 import "../../styles/tempTicketScreen.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const TicketScreen = () => {
   const itinerary: TicketType = data.itinerary;
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [seats, setSeats] = useState<SeatType[]>(itinerary.bus.seats);
   const [selectedSeat, setSelectedSeat] = useState<number | null>(null);
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const [ticketPrice, setTicketPrice] = useState<string>("");
 
+  const busData = location.state;
+
   const onClickHandler = (number: number) => {
     setSelectedSeat(number);
     setIsSelected(true);
   };
 
-  const confirmRes = (ticketPrice: string) => {
+  const confirmRes = async (ticketPrice: string) => {
     alert(
       `Reservation Completed!\nYour ticket price is: ${parseFloat(
         ticketPrice
       ).toFixed(2)}$\nYour seat is: ${selectedSeat}`
     );
-    navigate("/Home");
 
-    if (selectedSeat) {
-      const updatedSeats = [...seats];
-      updatedSeats[selectedSeat - 1] = {
-        number: updatedSeats[selectedSeat - 1].number,
-        isRes: true,
-      };
-      setSeats(updatedSeats);
+    const response = await fetch("http://localhost:3000/bus", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ seatRes: selectedSeat }),
+    });
+
+    if (response.ok) {
+      if (selectedSeat) {
+        const updatedSeats = [...seats];
+        updatedSeats[selectedSeat - 1] = {
+          number: updatedSeats[selectedSeat - 1].number,
+          isRes: true,
+        };
+        setSeats(updatedSeats);
+      }
+    } else {
+      console.error("Error sending data");
     }
 
     handleReset();
+    navigate("/Home");
   };
 
   const handleReset = () => {
@@ -65,11 +80,11 @@ const TicketScreen = () => {
           isSelected={isSelected}
           confirmRes={confirmRes}
           itinerary={{
-            DeptHour: "12:30 PM",
-            ArrHour: "16:30 PM",
-            Duration: "3 Hours",
-            DeptCity: "Thessalonikh",
-            ArrCity: "A8hna",
+            DeptHour: busData.departureHour,
+            ArrHour: busData.arriveHour,
+            Duration: busData.duration,
+            DeptCity: busData.cityFrom,
+            ArrCity: busData.cityTo,
             DeptDate: "23/10/2023",
             ArrDate: "23/10/2023",
           }}

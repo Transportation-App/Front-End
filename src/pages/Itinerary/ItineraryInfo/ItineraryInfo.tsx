@@ -1,6 +1,6 @@
 import Button from "@mui/material/Button";
-
-interface PropsType  {
+import { useNavigate } from "react-router-dom";
+interface PropsType {
   className?: string;
   departureHour: string;
   arriveHour: string;
@@ -8,11 +8,37 @@ interface PropsType  {
   cityTo: string;
   duration: number;
   numberOfPassengers: number;
-};
+}
 
 const ItineraryInfo = (props: PropsType) => {
-  let hour = Math.floor(props.duration / 3600);
-  let minutes = Math.round((props.duration / 3600 - hour) * 60);
+  let hour: number = Math.floor(props.duration / 3600);
+  let minutes: number = Math.round((props.duration / 3600 - hour) * 60);
+
+  let duration: string =
+    hour === 0
+      ? minutes === 0
+        ? ""
+        : minutes + "m"
+      : minutes === 0
+      ? hour + "h"
+      : hour + "h " + minutes + "m";
+
+  const navigate = useNavigate();
+
+  const handleClickEvent = () => {
+    const busData = {
+      departureHour: props.departureHour,
+      arriveHour: props.arriveHour,
+      duration: duration,
+      cityFrom: props.cityFrom,
+      cityTo: props.cityTo,
+      numberOfPassengers: props.numberOfPassengers,
+    };
+
+    navigate("/bus", {
+      state: busData,
+    });
+  };
 
   return (
     <div className={props.className}>
@@ -39,14 +65,16 @@ const ItineraryInfo = (props: PropsType) => {
         <span className="cityTo">{props.cityTo}</span>
       </p>
       <p className="w-max">{props.numberOfPassengers}</p>
-      <Button 
-          variant="contained"
-          color="primary"
-          className="w-28 h-12">
+      <Button
+        variant="contained"
+        color="primary"
+        className="w-28 h-12"
+        onClick={handleClickEvent}
+      >
         Book It
       </Button>
     </div>
   );
-}
+};
 
-export default ItineraryInfo
+export default ItineraryInfo;
