@@ -78,6 +78,7 @@ const ListItem = (props: PropsType) => {
           cityFrom={cityFrom}
           cityTo={cityTo}
           numberOfPassengers={numberOfPassengers}
+          id={props.itinerary.id}
         />
       </div>
       <ItineraryDescription

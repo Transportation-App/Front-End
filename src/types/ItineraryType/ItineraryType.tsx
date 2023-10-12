@@ -3,8 +3,9 @@ import { StationType } from "../StationType";
 import { StopType } from "../StopType";
 
 export type ItineraryType = {
-    hours: HourType[];
-    stations: StationType[];
-    stops: StopType[];
-    numberOfPassengers: number;
+  id: string;
+  hours: HourType[];
+  stations: StationType[];
+  stops: StopType[];
+  numberOfPassengers: number;
 };

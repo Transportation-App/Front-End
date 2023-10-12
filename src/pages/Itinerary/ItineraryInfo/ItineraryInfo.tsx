@@ -8,36 +8,32 @@ interface PropsType {
   cityTo: string;
   duration: number;
   numberOfPassengers: number;
+  id: string;
 }
 
 const ItineraryInfo = (props: PropsType) => {
   let hour: number = Math.floor(props.duration / 3600);
   let minutes: number = Math.round((props.duration / 3600 - hour) * 60);
 
-  let duration: string =
-    hour === 0
-      ? minutes === 0
-        ? ""
-        : minutes + "m"
-      : minutes === 0
-      ? hour + "h"
-      : hour + "h " + minutes + "m";
-
   const navigate = useNavigate();
 
-  const handleClickEvent = () => {
-    const busData = {
-      departureHour: props.departureHour,
-      arriveHour: props.arriveHour,
-      duration: duration,
-      cityFrom: props.cityFrom,
-      cityTo: props.cityTo,
-      numberOfPassengers: props.numberOfPassengers,
-    };
-
-    navigate("/bus", {
-      state: busData,
+  const handleClickEvent = async () => {
+    const response = await fetch("http://localhost:3000/bus/retrieve", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ itinID: props.id }),
     });
+
+    if (response.ok) {
+      const data = await response.json();
+      navigate("/bus", {
+        state: { data, itinID: props.id },
+      });
+    } else {
+      console.error("Error sending data");
+    }
   };
 
   return (

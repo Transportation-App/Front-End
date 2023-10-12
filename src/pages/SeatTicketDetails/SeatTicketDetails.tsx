@@ -22,7 +22,7 @@ interface PropsType {
   itinerary: {
     DeptHour: string;
     ArrHour: string;
-    Duration: string;
+    Duration: number;
     DeptCity: string;
     ArrCity: string;
     DeptDate: string;
