@@ -59,36 +59,43 @@ const ListItem = (props: PropsType) => {
   });
   const duration: number = durationCalculator(departure, arrive);
 
-  return (
-    <li className={props.className}>
-      <div className="w-full h-24 mt-10 mb-2 flex justify-center items-center bg-white border-transparent rounded-lg shadow-md">
-        <ArrowRightIcon
-          onClick={handleRotate}
-          className={`pointer ${
-            reveal
-              ? "rotate-90 duration-100 ease-in-out"
-              : "duration-100 ease-in-out"
+  console.log(cityTo, cityFrom)
+
+  if (cityFrom == "Athens" && cityTo == "Sparta"){
+    return (
+      <li className={props.className}>
+        <div className="w-full h-24 mt-10 mb-2 flex justify-center items-center bg-white border-transparent rounded-lg shadow-md">
+          <ArrowRightIcon
+            onClick={handleRotate}
+            className={`pointer ${
+              reveal
+                ? "rotate-90 duration-100 ease-in-out"
+                : "duration-100 ease-in-out"
+            }`}
+          />
+          <ItineraryInfo
+            className="w-[90%] flex justify-evenly items-center text-center"
+            departureHour={departure}
+            arriveHour={arrive}
+            duration={duration}
+            cityFrom={cityFrom}
+            cityTo={cityTo}
+            numberOfPassengers={numberOfPassengers}
+            id={props.itinerary.id}
+          />
+        </div>
+        <ItineraryDescription
+          className={`w-[90%] p-5 flex flex-col justify-center items-center bg-white border-transparent rounded-lg shadow-md ${
+            reveal ? " " : " hidden"
           }`}
+          itinerary={props.itinerary}
         />
-        <ItineraryInfo
-          className="w-[90%] flex justify-evenly items-center text-center"
-          departureHour={departure}
-          arriveHour={arrive}
-          duration={duration}
-          cityFrom={cityFrom}
-          cityTo={cityTo}
-          numberOfPassengers={numberOfPassengers}
-          id={props.itinerary.id}
-        />
-      </div>
-      <ItineraryDescription
-        className={`w-[90%] p-5 flex flex-col justify-center items-center bg-white border-transparent rounded-lg shadow-md ${
-          reveal ? " " : " hidden"
-        }`}
-        itinerary={props.itinerary}
-      />
-    </li>
-  );
+      </li>
+    );
+  }
+
+  // Return null when the condition is not met
+  return null;
 };
 
 export default ListItem;

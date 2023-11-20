@@ -6,6 +6,7 @@ import AdminPanel from "./pages/AdminPanel/TableData";
 import TicketScreen from "./pages/TicketScreen/TicketScreen";
 import PaymentScreen from "./pages/PaymentInfo/PaymentInfo";
 import LoginPage from "./pages/LoginPage/LoginPage";
+import HomePage from "./pages/Home/HomePage";
 
 const router = createBrowserRouter([
   {
@@ -14,13 +15,19 @@ const router = createBrowserRouter([
   },
   {
     path: "Home",
+    element: <HomePage/>,
+    
+  },
+  {
+    path: "Itinerary",
     element: (
       <ItineraryList
         className="w-[80%] overflow-y-auto"
-        itineraries={itineraryData}
+        // itineraries={itineraryData}
       />
-    ),
+    ),    
   },
+  
   {
     path: "Bus",
     element: <TicketScreen />,
