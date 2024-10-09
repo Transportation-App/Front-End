@@ -1,78 +1,58 @@
-import { useState } from "react";
-import { SeatType } from "../../types/SeatType";
+import { useEffect, useState } from "react";
 import { TicketType } from "../../types/TicketType";
 import BusLayout from "../BusLayout/BusLayout";
 import SeatTicketDetails from "../SeatTicketDetails/SeatTicketDetails";
 import Map from "../Map/Map";
 import "../../styles/tempTicketScreen.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import useFetch from "../../hooks/useFetch";
 
 const TicketScreen = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const itinID: string = "itin2";
+  const [tickets, setTickets] = useState<TicketType>();
+  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
 
-  const itinerary: TicketType = location.state.data;
-  const itinID: string = location.state.itinID;
+  const { data, loading, error } = useFetch<TicketType>(
+    process.env.REACT_APP_GET_BUS_ENDPOINT || "no key",
+    "POST",
+    JSON.stringify({ id: itinID })
+  );
 
-  const [seats, setSeats] = useState<SeatType[]>(itinerary.bus.seats);
-  const [selectedSeat, setSelectedSeat] = useState<number | null>(null);
-  const [isSelected, setIsSelected] = useState<boolean>(false);
-  const [ticketPrice, setTicketPrice] = useState<string>("");
-
-  const onClickHandler = (number: number) => {
-    setSelectedSeat(number);
-    setIsSelected(true);
-  };
-
-  const confirmRes = async (ticketPrice: string) => {
-    const response = await fetch("http://localhost:3000/bus", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ itinID: itinID, seatRes: selectedSeat }),
-    });
-
-    if (response.ok) {
-      alert(
-        `Reservation Completed!\nYour ticket price is: ${parseFloat(
-          ticketPrice
-        ).toFixed(2)}$\nYour seat is: ${selectedSeat}`
-      );
-      handleReset();
-      navigate("/Home");
-    } else {
-      console.error("Error sending data");
+  useEffect(() => {
+    if (data) {
+      setTickets(data);
     }
+  }, [data]);
+
+  const handleSelectedSeats = (updatedSeats: number[]) => {
+    setSelectedSeats(updatedSeats);
   };
 
-  const handleReset = () => {
-    setIsSelected(false);
-    setTicketPrice("");
-  };
+  if (loading) {
+    return <>loading</>;
+  }
+
+  if (!tickets) {
+    return <>No ticket data available</>;
+  }
 
   return (
     <div className="MainContainer">
       <BusLayout
-        seats={seats}
-        selectedSeat={selectedSeat}
-        onClick={onClickHandler}
+        seats={tickets?.bus.seats}
+        selectedSeats={selectedSeats}
+        onClick={handleSelectedSeats}
       />
 
       <div className="ticketMap">
         <SeatTicketDetails
-          selectedSeat={selectedSeat}
-          initPrice={itinerary.initPrice}
-          ticketPrice={ticketPrice}
-          setTicketPrice={setTicketPrice}
-          isSelected={isSelected}
-          confirmRes={confirmRes}
+          selectedSeats={selectedSeats}
+          initPrice={tickets.initPrice}
           itinerary={{
-            DeptHour: itinerary.DeptHour,
-            ArrHour: itinerary.ArrHour,
-            Duration: itinerary.Duration,
-            DeptCity: itinerary.DeptCity,
-            ArrCity: itinerary.ArrCity,
+            DeptHour: tickets.DeptHour,
+            ArrHour: tickets.ArrHour,
+            Duration: tickets.Duration,
+            DeptCity: tickets.DeptCity,
+            ArrCity: tickets.ArrCity,
             DeptDate: "23/10/2023",
             ArrDate: "23/10/2023",
           }}
