@@ -59,9 +59,9 @@ const ListItem = (props: PropsType) => {
   });
   const duration: number = durationCalculator(departure, arrive);
 
-  console.log(cityTo, cityFrom)
+  console.log(cityTo, cityFrom);
 
-  if (cityFrom == "Athens" && cityTo == "Sparta"){
+  if (cityFrom === "Athens" && cityTo === "Sparta") {
     return (
       <li className={props.className}>
         <div className="w-full h-24 mt-10 mb-2 flex justify-center items-center bg-white border-transparent rounded-lg shadow-md">

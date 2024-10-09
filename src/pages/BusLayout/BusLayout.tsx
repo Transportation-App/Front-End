@@ -1,32 +1,21 @@
 import "../../styles/tempTicketScreen.css";
 import { SeatType } from "../../types/SeatType";
-import Button from "./UI/Button";
-import { useState } from "react";
+import React from "react";
+import Seat from "./UI/Seat";
 
 interface PropsType {
   seats: SeatType[];
-  selectedSeat: number | null;
-  onClick: (number: number) => void;
+  selectedSeats: number[];
+  onClick: (number: number[]) => void;
 }
 
-const BusLayout = (props: PropsType) => {
+const BusLayout: React.FC<PropsType> = ({ seats, selectedSeats, onClick }) => {
   const seatsPerRow = 2;
-  const rows = Math.floor(props.seats.length / seatsPerRow);
-  let count = props.seats.length - 1;
-  const [isPressed, setIsPressed] = useState(false);
+  const rows = Math.floor(seats.length / seatsPerRow);
+  let count = 0;
 
-  const handleClickEvent = (event: any) => {
-    if (!event.currentTarget) return;
-
-    const button = event.currentTarget;
-
-    if (isPressed && button.value !== props.selectedSeat) {
-      props.onClick(parseInt(button.value));
-      return;
-    }
-
-    setIsPressed(!isPressed);
-    props.onClick(parseInt(button.value));
+  const handleSeatChange = (updatedSeats: number[]) => {
+    onClick(updatedSeats);
   };
 
   const createSeats = () => {
@@ -34,17 +23,15 @@ const BusLayout = (props: PropsType) => {
 
     for (let i = 0; i < seatsPerRow; i++) {
       tempSeats.push(
-        <Button
-          isPressed={isPressed}
+        <Seat
+          isRes={seats[count].isRes}
           key={count}
-          number={count}
-          isRes={props.seats[count].isRes}
-          onClick={handleClickEvent}
-          setIsPressed={setIsPressed}
-          isSelected={props.selectedSeat === count + 1}
+          count={count}
+          selectedSeats={selectedSeats}
+          onSeatChange={handleSeatChange}
         />
       );
-      count--;
+      count++;
     }
 
     return tempSeats;
@@ -56,7 +43,20 @@ const BusLayout = (props: PropsType) => {
     for (let i = 0; i < rows / 2; i++) {
       tempRows.push(
         <div key={Math.random()} className="row">
-          {i == Math.floor(rows / 4) ? (
+          {createSeats()}
+
+          {i !== Math.floor(rows / 2) - 1 ? (
+            <div key={i} className="aisle"></div>
+          ) : (
+            <Seat
+              isRes={seats[count].isRes}
+              count={count++}
+              selectedSeats={selectedSeats}
+              onSeatChange={handleSeatChange}
+            />
+          )}
+
+          {i === Math.floor(rows / 4) ? (
             <>
               <div key={Math.random()} className="aisle-door"></div>
               <div key={Math.random()} className="aisle-door"></div>
@@ -64,30 +64,22 @@ const BusLayout = (props: PropsType) => {
           ) : (
             createSeats()
           )}
-
-          {i != 0 ? (
-            <div key={i} className="aisle"></div>
-          ) : (
-            <Button
-              isPressed={isPressed}
-              key={count--}
-              number={count}
-              isRes={props.seats[count].isRes}
-              onClick={handleClickEvent}
-              setIsPressed={setIsPressed}
-              isSelected={props.selectedSeat === count + 1}
-            />
-          )}
-          {createSeats()}
         </div>
       );
-      if (i == Math.floor(rows / 4)) count -= 2;
+      if (i === Math.floor(rows / 4)) count += 2;
     }
 
     return tempRows;
   };
 
-  return <div className="bus-layout">{createRows()}</div>;
+  return (
+    <div className="bus-layout">
+      <h2 className="text-gray-500 text-opacity-80 font-semibold italic text-2xl text-center pt-[10px]">
+        Επιλέξτε Θέση
+      </h2>
+      <main className="bus-container">{createRows()}</main>
+    </div>
+  );
 };
 
 export default BusLayout;
