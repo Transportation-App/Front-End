@@ -4,6 +4,8 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { createTheme, useTheme, ThemeProvider, Theme } from '@mui/material/styles';
+import englishBusLocations from '../../locales/en/englishBusLocations.json'
+import greekBusLocations from '../../locales/gr/greekBusLocations.json'
 
 // Theme.ts
 const customTheme = (outerTheme: Theme) =>
@@ -66,49 +68,49 @@ interface FilmOptionType {
   title: string;
 }
 
-const greekBusLocations = [
-    { title: 'Αθήνα' },
-    { title: 'Θεσσαλονίκη' },
-    { title: 'Πάτρα' },
-    { title: 'Ηράκλειο' },
-    { title: 'Λάρισα' },
-    { title: 'Βόλος' },
-    { title: 'Ιωάννινα' },
-    { title: 'Χανιά' },
-    { title: 'Χαλκίδα' },
-    { title: 'Ρόδος' },
-    { title: 'Πάτρα' },
-    { title: 'Καβάλα' },
-    { title: 'Ρέθυμνο' },
-    { title: 'Λάρισα' },
-    { title: 'Χίος' },
-    { title: 'Κομοτηνή' },
-    { title: 'Σέρρες' },
-    { title: 'Καλαμάτα' },
-    { title: 'Κέρκυρα' }
-  ];
+// const greekBusLocations = [
+//     { title: 'Αθήνα' },
+//     { title: 'Θεσσαλονίκη' },
+//     { title: 'Πάτρα' },
+//     { title: 'Ηράκλειο' },
+//     { title: 'Λάρισα' },
+//     { title: 'Βόλος' },
+//     { title: 'Ιωάννινα' },
+//     { title: 'Χανιά' },
+//     { title: 'Χαλκίδα' },
+//     { title: 'Ρόδος' },
+//     { title: 'Πάτρα' },
+//     { title: 'Καβάλα' },
+//     { title: 'Ρέθυμνο' },
+//     { title: 'Λάρισα' },
+//     { title: 'Χίος' },
+//     { title: 'Κομοτηνή' },
+//     { title: 'Σέρρες' },
+//     { title: 'Καλαμάτα' },
+//     { title: 'Κέρκυρα' }
+//   ];
   
 
-  const englishBusLocations = [
-    { title: 'Athens' },
-    { title: 'Thessaloniki' },
-    { title: 'Patra' },
-    { title: 'Heraklion' },
-    { title: 'Larissa' },
-    { title: 'Volos' },
-    { title: 'Ioannina' },
-    { title: 'Chania' },
-    { title: 'Chalcis' },
-    { title: 'Rhodes' },
-    { title: 'Heraklion' },
-    { title: 'Patra' },
-    { title: 'Kavala' },
-    { title: 'Rethymno' },
-    { title: 'Larissa' },
-    { title: 'Chios' },
-    { title: 'Komotini' },
-    { title: 'Serres' },
-    { title: 'Kalamata' },
-    { title: 'Corfu' }
-  ];
+//   const englishBusLocations = [
+//     { title: 'Athens' },
+//     { title: 'Thessaloniki' },
+//     { title: 'Patra' },
+//     { title: 'Heraklion' },
+//     { title: 'Larissa' },
+//     { title: 'Volos' },
+//     { title: 'Ioannina' },
+//     { title: 'Chania' },
+//     { title: 'Chalcis' },
+//     { title: 'Rhodes' },
+//     { title: 'Heraklion' },
+//     { title: 'Patra' },
+//     { title: 'Kavala' },
+//     { title: 'Rethymno' },
+//     { title: 'Larissa' },
+//     { title: 'Chios' },
+//     { title: 'Komotini' },
+//     { title: 'Serres' },
+//     { title: 'Kalamata' },
+//     { title: 'Corfu' }
+//   ];
   

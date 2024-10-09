@@ -1,0 +1,29 @@
+{
+    "trips": [
+      {
+        "id": 1,
+        "start": "Athens",
+        "destination": "Thessaloniki",
+        "departureTime": "2024-10-09T08:00:00",
+        "arrivalTime": "2024-10-09T12:00:00",
+        "price": 45
+      },
+      {
+        "id": 2,
+        "start": "Patras",
+        "destination": "Ioannina",
+        "departureTime": "2024-10-10T09:00:00",
+        "arrivalTime": "2024-10-10T13:00:00",
+        "price": 40
+      },
+      {
+        "id": 3,
+        "start": "Heraklion",
+        "destination": "Chania",
+        "departureTime": "2024-10-11T10:00:00",
+        "arrivalTime": "2024-10-11T12:30:00",
+        "price": 35
+      }
+    ]
+  }
+  
