@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
@@ -8,14 +8,12 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import gr from "../../locales/gr/common.json";
 import en from "../../locales/en/common.json";
-import data from "../../locales/gr/dData.json";
 import { GridColTypeDef } from "@mui/x-data-grid";
 import GloballyCustomizedOptions from "./AutoComplete";
 import ChangeLang from "./LanguageChange";
 import { Alert, Paper, Snackbar} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-// import DarkThemButton from "./DarkThemeButton";
-import 'tailwindcss/tailwind.css';
+import DarkThemButton from "./DarkThemeButton";
 
 import {
   GridRowsProp,
@@ -99,7 +97,6 @@ const dataCreate = gr.blog_posts?.titles?.create;
 
 function EditToolbar(props: EditToolbarProps) {
   const { setRows, setRowModesModel, handleLanguageSwitch, locale } = props;
-  const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
     const id = randomId();
@@ -114,61 +111,15 @@ function EditToolbar(props: EditToolbarProps) {
     }));
   };
 
-  const handleSendClick = () => {
-    setOpen(true);
-  };
-
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpen(false);
-  };
-
   return (
-    <>
-      <GridToolbarContainer
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1,
-          backgroundColor: "#fff",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: '0 16px', // Adding some padding for better spacing
-        }}
-      >
-        {/* Left button */}
-        <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-          {dataCreate}
-        </Button>
-
-        {/* Centered button */}
-        <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-          <Button
-            endIcon={<SendIcon />}
-            onClick={handleSendClick}
-            sx={{ width: "10%" }}
-          >
-            Sent
-          </Button>
-        </Box>
-
-        {/* Right component */}
-        <ChangeLang handler={handleLanguageSwitch} />
-      </GridToolbarContainer>
-
-      {/* Snackbar for success message */}
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
-          This is a success message!
-        </Alert>
-      </Snackbar>
-    </>
+    <GridToolbarContainer>
+      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+        {dataCreate}
+      </Button>
+      <ChangeLang handler={handleLanguageSwitch} />
+    </GridToolbarContainer>
   );
 }
-
 
 export default function FullFeaturedCrudGrid() {
   const [rows, setRows] = React.useState(initialRows);
@@ -261,34 +212,34 @@ export default function FullFeaturedCrudGrid() {
   };
 
   const columns: GridColDef[] = [
-    { field: "name", headerName: dataName, width: 260, editable: false },
+    { field: "name", headerName: dataName, width: 260, editable: true },
     {
       field: "city",
       headerName: dataStart,
       width: 260,
       align: "left",
       headerAlign: "left",
-      renderCell: (params) => <GloballyCustomizedOptions/>,
+      renderCell: (params) => <GloballyCustomizedOptions />,
     },
     {
       field: "joinDate",
       headerName: dataDest,
       type: "singleSelect",
       width: 260,
-      renderCell: (params) => <GloballyCustomizedOptions/>,
+      renderCell: (params) => <GloballyCustomizedOptions />,
     },
     {
       field: "role",
       headerName: dataDepart,
       width: 260,
-      editable: false,
+      editable: true,
       type: "date",
     },
     {
       field: "arrival",
       headerName: dataArr,
       width: 100,
-      editable: false,
+      editable: true,
       type: "date",
     },
     {
@@ -296,7 +247,7 @@ export default function FullFeaturedCrudGrid() {
       ...usdPrice,
       headerName: dataPrice,
       width: 260,
-      editable: false,
+      editable: true,
       type: "number",
     },
 
@@ -350,34 +301,23 @@ export default function FullFeaturedCrudGrid() {
     },
   ];
 
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+  const [open, setOpen] = React.useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
+  const handleClick = () => {
+    setOpen(true);
+  };
 
-    window.addEventListener('resize', handleResize);
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+    setOpen(false);
+  };
 
-  const boxWidth = windowSize.width > 768 ? '60%' : '100%';
-  const boxHeight = windowSize.height > 800 ? '80vh' : '80vh';
 
   return (
-    <Paper  
-      className="max-h-[400px] overflow-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-300"
-      style={{ maxHeight: boxHeight }}
-      >
+    <Paper  style={{ maxHeight: 800, overflow: "auto" }}>
       {/* sx={{backgroundColor:'dimgray'}} */}
       <DataGrid
         rows={rows}
@@ -394,6 +334,14 @@ export default function FullFeaturedCrudGrid() {
           toolbar: { setRows, setRowModesModel, handleLanguageSwitch, locale },
         }}
       />
+      <Button  endIcon={<SendIcon/>} onClick={handleClick} sx={{ width: "100%" }}>
+        Sent
+      </Button>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+          This is a success message!
+        </Alert>
+      </Snackbar>
       {/* <DarkThemButton/>  Still in progress*/}
     </Paper>
   );
