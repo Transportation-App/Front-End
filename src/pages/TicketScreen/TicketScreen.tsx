@@ -5,8 +5,13 @@ import SeatTicketDetails from "../SeatTicketDetails/SeatTicketDetails";
 import Map from "../Map/Map";
 import "../../styles/tempTicketScreen.css";
 import useFetch from "../../hooks/useFetch";
+import useWebSocket from "../../hooks/useWebSocket";
 
 const TicketScreen = () => {
+  const { messages, sendMessage, socket } = useWebSocket(
+    process.env.REACT_APP_WS_ENDPOINT || "no key"
+  );
+
   const itinID: string = "itin2";
   const [tickets, setTickets] = useState<TicketType>();
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
@@ -48,6 +53,7 @@ const TicketScreen = () => {
           selectedSeats={selectedSeats}
           initPrice={tickets.initPrice}
           itinerary={{
+            itinID: itinID,
             DeptHour: tickets.DeptHour,
             ArrHour: tickets.ArrHour,
             Duration: tickets.Duration,

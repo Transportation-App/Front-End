@@ -1,10 +1,11 @@
-import { Button, Stepper, Step, StepLabel } from "@mui/material";
+import { Button, Stepper, Step, StepLabel, Snackbar } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import SeatsDetails from "./StepContent/SeatsDetails";
 import Overview from "./StepContent/Overview";
 import PaymentForm from "./StepContent/PaymentForm";
-import StripeProvider from "../../Provider/StripeProvider";
+import CountdownTimer from "../CountdownTimer/CountdownTimer";
+import useWebSocket from "../../hooks/useWebSocket";
 
 interface SeatFormData {
   firstName: string;
@@ -21,12 +22,23 @@ const steps = ["Seats Details", "Overview", "Payment/Completion"];
 const Checkout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { messages, sendMessage, socket } = useWebSocket(
+    process.env.REACT_APP_WS_ENDPOINT || "no key"
+  );
 
-  const { selectedSeats = [], initPrice } =
-    (location.state as { selectedSeats: number[]; initPrice: number }) || {};
+  const {
+    itinID,
+    selectedSeats = [],
+    initPrice,
+  } = (location.state as {
+    itinID: string;
+    selectedSeats: number[];
+    initPrice: number;
+  }) || {};
 
   const [activeStep, setActiveStep] = useState(0);
-
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [formData, setFormData] = useState<Record<number, SeatFormData>>(
     selectedSeats.reduce((acc, seat) => {
       acc[seat] = {
@@ -54,9 +66,52 @@ const Checkout: React.FC = () => {
 
   useEffect(() => {
     if (selectedSeats.length === 0) {
-      navigate("/Bus");
+      navigate("/");
     }
   }, [selectedSeats, navigate]);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (messages.length > 0) {
+      timeoutId = setTimeout(() => {
+        messages.forEach((msg) => {
+          if (msg) {
+            const currentTime = Date.now();
+            const parsedMessage = JSON.parse(msg);
+            const remainingTime = parsedMessage.expiryTime - currentTime;
+
+            if (remainingTime > 0) {
+              setTimeLeft(remainingTime);
+              setOpenSnackbar(true);
+            } else {
+              navigate("/");
+            }
+          }
+        });
+      }, 3000);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [messages, navigate]);
+
+  useEffect(() => {
+    if (socket) {
+      sendSelectedSeatsToWebSocket();
+    }
+  }, [socket]);
+
+  const sendSelectedSeatsToWebSocket = () => {
+    if (socket) {
+      const message = JSON.stringify({
+        type: "GET_EXPIRY_TIME",
+        data: { itinID, selectedSeats },
+      });
+      sendMessage(message);
+    }
+  };
 
   const handleInputChange = (
     seat: number,
@@ -115,12 +170,16 @@ const Checkout: React.FC = () => {
       />
     ),
     1: <Overview formData={formData} />,
-    2: (
-      <StripeProvider>
-        <PaymentForm totalPrice={totalPrice} />
-      </StripeProvider>
-    ),
+    2: <PaymentForm totalPrice={totalPrice} formData={formData} />,
   };
+
+  if (timeLeft === null) {
+    return <>loading...</>;
+  }
+
+  if (timeLeft < 0) {
+    navigate("/");
+  }
 
   return (
     <div className="flex flex-col gap-2 h-full w-full px-[100px]">
@@ -135,7 +194,9 @@ const Checkout: React.FC = () => {
           }}
         >
           {steps.map((label) => (
-            <Step key={label}>{<StepLabel>{label}</StepLabel>}</Step>
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
           ))}
         </Stepper>
         <Button
@@ -154,6 +215,10 @@ const Checkout: React.FC = () => {
       <section className="flex justify-evenly items-center flex-col h-[80vh] w-full ">
         {StepContent[activeStep]}
       </section>
+
+      {openSnackbar && timeLeft > 0 && (
+        <CountdownTimer expiryTime={Date.now() + timeLeft} />
+      )}
     </div>
   );
 };

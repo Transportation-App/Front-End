@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../../styles/tempTicketScreen.css";
 import {
   Box,
@@ -11,9 +11,11 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import { useState } from "react";
 
 interface PropsType {
   itinerary: {
+    itinID: string;
     DeptHour: string;
     ArrHour: string;
     Duration: number;
@@ -31,6 +33,48 @@ const SeatTicketDetails: React.FC<PropsType> = ({
   selectedSeats,
   initPrice,
 }) => {
+  const [loadingUpdate, setLoadingUpdate] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
+  const onClickHandler = async (e: any) => {
+    try {
+      setLoadingUpdate(true);
+      const res = await fetch(
+        process.env.REACT_APP_PUT_BUS_ENDPOINT || "no key",
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "PUT",
+          body: JSON.stringify({
+            itinID: itinerary.itinID,
+            selectedSeats: selectedSeats,
+            isRes: true,
+          }),
+        }
+      );
+
+      if (res.ok) {
+        const data: { expiryTime: number; updated: boolean } | null =
+          await res.json();
+        navigate("/checkout", {
+          state: {
+            itinID: itinerary.itinID,
+            selectedSeats: selectedSeats,
+            initPrice: initPrice,
+          },
+        });
+      } else {
+        console.log("Something went wrong");
+      }
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setLoadingUpdate(false);
+    }
+  };
+
   return (
     <div className="seat-ticket-details">
       {!(selectedSeats.length > 0) ? (
@@ -124,19 +168,15 @@ const SeatTicketDetails: React.FC<PropsType> = ({
               </div>
             </div>
             <div className="flex items-end w-full justify-end gap-3">
-              <NavLink
-                to={"/Checkout"}
-                state={{ selectedSeats: selectedSeats, initPrice: initPrice }}
+              <Button
+                size="medium"
+                variant="contained"
+                className="submit-btn"
+                onClick={onClickHandler}
+                // disabled={!(selectedSeats.length > 0)}
               >
-                <Button
-                  size="medium"
-                  variant="contained"
-                  className="submit-btn"
-                  // disabled={!(selectedSeats.length > 0)}
-                >
-                  {"Book your seat!"}
-                </Button>
-              </NavLink>
+                {"Book your seat!"}
+              </Button>
             </div>
           </div>
         </>
