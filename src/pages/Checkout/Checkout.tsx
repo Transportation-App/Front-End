@@ -1,4 +1,4 @@
-import { Button, Stepper, Step, StepLabel, Snackbar } from "@mui/material";
+import { Button, Stepper, Step, StepLabel } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import SeatsDetails from "./StepContent/SeatsDetails";
@@ -27,17 +27,20 @@ const Checkout: React.FC = () => {
   );
 
   const {
+    expiryTime,
     itinID,
     selectedSeats = [],
     initPrice,
   } = (location.state as {
+    expiryTime: number | null;
     itinID: string;
     selectedSeats: number[];
     initPrice: number;
   }) || {};
 
+  const timeLeft: number | null = expiryTime!! - Date.now();
   const [activeStep, setActiveStep] = useState(0);
-  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [open, setOpen] = useState<boolean>(true);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [formData, setFormData] = useState<Record<number, SeatFormData>>(
     selectedSeats.reduce((acc, seat) => {
@@ -71,47 +74,12 @@ const Checkout: React.FC = () => {
   }, [selectedSeats, navigate]);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    if (messages.length > 0) {
-      timeoutId = setTimeout(() => {
-        messages.forEach((msg) => {
-          if (msg) {
-            const currentTime = Date.now();
-            const parsedMessage = JSON.parse(msg);
-            const remainingTime = parsedMessage.expiryTime - currentTime;
-
-            if (remainingTime > 0) {
-              setTimeLeft(remainingTime);
-              setOpenSnackbar(true);
-            } else {
-              navigate("/");
-            }
-          }
-        });
-      }, 3000);
+    if (timeLeft > 0) {
+      setOpenSnackbar(true);
+    } else {
+      navigate("/");
     }
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [messages, navigate]);
-
-  useEffect(() => {
-    if (socket) {
-      sendSelectedSeatsToWebSocket();
-    }
-  }, [socket]);
-
-  const sendSelectedSeatsToWebSocket = () => {
-    if (socket) {
-      const message = JSON.stringify({
-        type: "GET_EXPIRY_TIME",
-        data: { itinID, selectedSeats },
-      });
-      sendMessage(message);
-    }
-  };
+  }, [timeLeft, setOpenSnackbar, navigate]);
 
   const handleInputChange = (
     seat: number,
@@ -160,6 +128,37 @@ const Checkout: React.FC = () => {
     });
   };
 
+  const handleClose = async () => {
+    setOpen(false);
+    const res = await fetch(
+      process.env.REACT_APP_PUT_BUS_ENDPOINT || "no key",
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify({
+          itinID: itinID,
+          selectedSeats: selectedSeats,
+          lockType: "open",
+        }),
+      }
+    );
+
+    if (res.ok) {
+      const data: {
+        success: boolean;
+        message: string;
+        data: { updated: boolean } | null;
+      } = await res.json();
+
+      if (data.success) {
+        alert("Reservation expired!");
+        navigate("/");
+      }
+    }
+  };
+
   const StepContent: { [step: number]: JSX.Element } = {
     0: (
       <SeatsDetails
@@ -170,15 +169,17 @@ const Checkout: React.FC = () => {
       />
     ),
     1: <Overview formData={formData} />,
-    2: <PaymentForm totalPrice={totalPrice} formData={formData} />,
+    2: (
+      <PaymentForm
+        itinID={itinID}
+        totalPrice={totalPrice}
+        formData={formData}
+      />
+    ),
   };
 
   if (timeLeft === null) {
     return <>loading...</>;
-  }
-
-  if (timeLeft < 0) {
-    navigate("/");
   }
 
   return (
@@ -217,7 +218,11 @@ const Checkout: React.FC = () => {
       </section>
 
       {openSnackbar && timeLeft > 0 && (
-        <CountdownTimer expiryTime={Date.now() + timeLeft} />
+        <CountdownTimer
+          expiryTime={Date.now() + timeLeft}
+          open={open}
+          handleClose={handleClose}
+        />
       )}
     </div>
   );

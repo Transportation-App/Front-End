@@ -16,11 +16,16 @@ type SeatFormData = {
 };
 
 type paymentInfo = {
+  itinID: string;
   totalPrice: number;
   formData: Record<number, SeatFormData>;
 };
 
-const PaymentForm: React.FC<paymentInfo> = ({ totalPrice, formData }) => {
+const PaymentForm: React.FC<paymentInfo> = ({
+  itinID,
+  totalPrice,
+  formData,
+}) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isSucceeded, setIsSucceeded] = useState<boolean>(false);
   const [url, setUrl] = useState<string>("");
@@ -39,7 +44,8 @@ const PaymentForm: React.FC<paymentInfo> = ({ totalPrice, formData }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            totalPrice: totalPrice * 100,
+            itinID: itinID,
+            totalPrice: (totalPrice * 100).toFixed(2),
             formData: formData,
           }),
         }

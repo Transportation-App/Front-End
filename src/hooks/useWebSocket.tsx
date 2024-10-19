@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
 
-const useWebSocket = (url: string) => {
+const useWebSocket = (url: string, itinID?: string) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
-  const [inputMessage, setInputMessage] = useState<string>("");
 
   useEffect(() => {
     const ws = new WebSocket(url);
 
     ws.onopen = () => {
-      console.log("WebSocket connection established");
+      if (itinID) {
+        const message = JSON.stringify({
+          type: "SEND_ITIN_ID",
+          data: { itinID },
+        });
+        ws.send(message);
+      }
       setSocket(ws);
     };
 
@@ -18,14 +23,13 @@ const useWebSocket = (url: string) => {
     };
 
     ws.onclose = () => {
-      console.log("WebSocket connection closed");
       setSocket(null);
     };
 
     return () => {
       ws.close();
     };
-  }, [url]);
+  }, [url, itinID]);
 
   const sendMessage = (message: string) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
@@ -37,8 +41,6 @@ const useWebSocket = (url: string) => {
 
   return {
     messages,
-    inputMessage,
-    setInputMessage,
     sendMessage,
     socket,
   };

@@ -2,16 +2,19 @@ import React, { useState, useEffect } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { AlertTitle } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 interface TimerProps {
   expiryTime: number;
+  open: boolean;
+  handleClose: () => void;
 }
 
-const CountdownTimer: React.FC<TimerProps> = ({ expiryTime }) => {
+const CountdownTimer: React.FC<TimerProps> = ({
+  expiryTime,
+  open,
+  handleClose,
+}) => {
   const [timeLeft, setTimeLeft] = useState<number>(expiryTime - Date.now());
-  const [open, setOpen] = useState<boolean>(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -20,21 +23,15 @@ const CountdownTimer: React.FC<TimerProps> = ({ expiryTime }) => {
 
       if (remaining <= 0) {
         clearInterval(intervalId);
-        setOpen(false);
-        alert("Reservation expired!");
-        navigate("/");
+        handleClose();
       }
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [expiryTime]);
+  }, [expiryTime, handleClose]);
 
   const minutes = Math.floor(timeLeft / 60000);
   const seconds = Math.floor((timeLeft % 60000) / 1000);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   return (
     <>

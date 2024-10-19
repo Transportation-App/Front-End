@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../../styles/tempTicketScreen.css";
 import {
   Box,
@@ -50,21 +50,32 @@ const SeatTicketDetails: React.FC<PropsType> = ({
           body: JSON.stringify({
             itinID: itinerary.itinID,
             selectedSeats: selectedSeats,
-            isRes: true,
+            lockType: "tempLocked",
           }),
         }
       );
 
       if (res.ok) {
-        const data: { expiryTime: number; updated: boolean } | null =
-          await res.json();
-        navigate("/checkout", {
-          state: {
-            itinID: itinerary.itinID,
-            selectedSeats: selectedSeats,
-            initPrice: initPrice,
-          },
-        });
+        const data: {
+          success: boolean;
+          message: string;
+          data: { updated: boolean } | null;
+        } = await res.json();
+
+        if (data.success) {
+          const expiryTime = Date.now() + 8 * 60 * 1000;
+
+          navigate("/checkout", {
+            state: {
+              expiryTime: expiryTime,
+              itinID: itinerary.itinID,
+              selectedSeats: selectedSeats,
+              initPrice: initPrice,
+            },
+          });
+        } else {
+          console.log("Something went wrong");
+        }
       } else {
         console.log("Something went wrong");
       }

@@ -1,14 +1,35 @@
+import React from "react";
 import "../../styles/tempTicketScreen.css";
 
 const Map = () => {
+  // Define your locations
+  const origin = { lat: 40.6401, lng: 22.9444 }; // Thessaloniki
+  const destination = { lat: 40.5411, lng: 21.4046 }; // Florina
+  const waypoints = [
+    { lat: 40.7489, lng: 22.0082 }, // Edessa
+    { lat: 40.5833, lng: 21.67 }, // Amyntaio
+  ];
+
+  // Construct OSM URL
+  const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${
+    (origin.lng + destination.lng) / 2 - 0.5
+  },${(origin.lat + destination.lat) / 2 - 0.5},${
+    (origin.lng + destination.lng) / 2 + 0.5
+  },${(origin.lat + destination.lat) / 2 + 0.5}&layer=mapnik&marker=${
+    origin.lat
+  },${origin.lng}&marker=${destination.lat},${
+    destination.lng
+  }&marker=${waypoints.map((wp) => `${wp.lat},${wp.lng}`).join("&marker=")}`;
+
   return (
     <div className="map">
       <iframe
-        src="https://www.google.com/maps/embed?pb=!1m34!1m12!1m3!1d1580482.813689821!2d21.825563270270717!3d39.31363229525876!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m19!3e0!4m5!1s0x14a838f41428e0ed%3A0x9bae715b8d574a9!2sThessaloniki!3m2!1d40.6400629!2d22.944419099999998!4m5!1s0x135f45553b3f43f1%3A0x5344ba71e6c6fec7!2zzpvOsc68zq_OsQ!3m2!1d38.8997433!2d22.4337387!4m5!1s0x14a1bd1f067043f1%3A0x2736354576668ddd!2zzpHOuM6uzr3OsQ!3m2!1d37.9838096!2d23.727538799999998!5e0!3m2!1sel!2sgr!4v1727456770530!5m2!1sel!2sgr"
+        src={osmUrl}
         width="100%"
-        height="100%"
+        height="400"
         style={{ border: 0, borderRadius: "0.575rem" }}
         loading="lazy"
+        title="OpenStreetMap Route"
       ></iframe>
     </div>
   );
