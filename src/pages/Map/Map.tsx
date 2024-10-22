@@ -1,37 +1,86 @@
-import React from "react";
-import "../../styles/tempTicketScreen.css";
+import React, { useEffect } from "react";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet-routing-machine";
+import "leaflet/dist/leaflet.css";
 
-const Map = () => {
-  // Define your locations
-  const origin = { lat: 40.6401, lng: 22.9444 }; // Thessaloniki
-  const destination = { lat: 40.5411, lng: 21.4046 }; // Florina
-  const waypoints = [
-    { lat: 40.7489, lng: 22.0082 }, // Edessa
-    { lat: 40.5833, lng: 21.67 }, // Amyntaio
-  ];
+interface MapWithRoutingProps {
+  waypoints: [number, number][];
+}
 
-  // Construct OSM URL
-  const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${
-    (origin.lng + destination.lng) / 2 - 0.5
-  },${(origin.lat + destination.lat) / 2 - 0.5},${
-    (origin.lng + destination.lng) / 2 + 0.5
-  },${(origin.lat + destination.lat) / 2 + 0.5}&layer=mapnik&marker=${
-    origin.lat
-  },${origin.lng}&marker=${destination.lat},${
-    destination.lng
-  }&marker=${waypoints.map((wp) => `${wp.lat},${wp.lng}`).join("&marker=")}`;
+const waypointsData: [number, number][] = [
+  [40.5493, 21.4018],
+  [40.6103, 21.7482],
+  [40.6401, 22.9444],
+];
 
+const RoutingPlan: React.FC<MapWithRoutingProps> = ({ waypoints }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+
+    const routingWaypoints = waypoints.map((coords) =>
+      L.latLng(coords[0], coords[1])
+    );
+
+    const createMarker = (
+      waypointIndex: number,
+      waypoint: L.Routing.Waypoint,
+      numberOfWaypoints: number
+    ) => {
+      const marker = L.marker(waypoint.latLng);
+
+      const popupContent = `Location: ${waypoint.latLng.lat.toFixed(
+        4
+      )}, ${waypoint.latLng.lng.toFixed(4)}`;
+      marker.bindPopup(popupContent);
+
+      return marker;
+    };
+
+    const plan = L.Routing.plan(routingWaypoints, {
+      draggableWaypoints: false,
+      addWaypoints: false,
+      routeWhileDragging: false,
+      createMarker,
+    });
+
+    const lineOptions = {
+      extendToWaypoints: false,
+      addWaypoints: false,
+      missingRouteTolerance: 5,
+    };
+
+    const routingControl = L.Routing.control({
+      plan,
+      routeWhileDragging: false,
+      show: false,
+      lineOptions,
+    }).addTo(map);
+
+    return () => {
+      map.removeControl(routingControl);
+    };
+  }, [map, waypoints]);
+
+  return null;
+};
+
+const Map: React.FC = () => {
   return (
-    <div className="map">
-      <iframe
-        src={osmUrl}
-        width="100%"
-        height="400"
-        style={{ border: 0, borderRadius: "0.575rem" }}
-        loading="lazy"
-        title="OpenStreetMap Route"
-      ></iframe>
-    </div>
+    <MapContainer
+      center={[40.6401, 22.9444]}
+      zoom={6}
+      style={{ height: "100%", width: "100%" }}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+
+      <RoutingPlan waypoints={waypointsData} />
+    </MapContainer>
   );
 };
 
