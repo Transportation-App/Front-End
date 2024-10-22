@@ -10,13 +10,14 @@ const ArrivalDate = () => {
 
   return (
     <TextField
-      label="Select Arrival Date"
+      label="Επιστροφή"  
       type="date"
       value={selectedDate}
       onChange={handleDateChange}
       InputLabelProps={{
-        shrink: true,
+        shrink: true, 
       }}
+      fullWidth
     />
   );
 };

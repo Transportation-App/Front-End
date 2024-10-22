@@ -10,13 +10,14 @@ const DepartureDate = () => {
 
   return (
     <TextField
-      label="Select Departure Date"
+      label="Αναχώρηση"  
       type="date"
       value={selectedDate}
       onChange={handleDateChange}
       InputLabelProps={{
-        shrink: true,
+        shrink: true,  
       }}
+      fullWidth
     />
   );
 };
