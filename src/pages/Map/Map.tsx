@@ -50,6 +50,12 @@ const RoutingPlan: React.FC<MapWithRoutingProps> = ({ waypoints }) => {
       extendToWaypoints: false,
       addWaypoints: false,
       missingRouteTolerance: 5,
+      styles: [
+        {
+          color: "blue",
+          weight: 5,
+        },
+      ],
     };
 
     const routingControl = L.Routing.control({
@@ -72,7 +78,7 @@ const Map: React.FC = () => {
     <MapContainer
       center={[40.6401, 22.9444]}
       zoom={6}
-      style={{ height: "100%", width: "100%" }}
+      style={{ height: "100%", width: "100%", borderRadius: "0.575rem" }}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
