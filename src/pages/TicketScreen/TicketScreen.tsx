@@ -8,11 +8,32 @@ import useFetch from "../../hooks/useFetch";
 import useWebSocket from "../../hooks/useWebSocket";
 import { SeatType } from "../../types/SeatType";
 
+type ItineraryType = {
+  itinID: string;
+  deptHour: string;
+  arrHour: string;
+  duration: number;
+  deptCity: string;
+  arrCity: string;
+  deptDate: string;
+  arrDate: string;
+};
+
 const TicketScreen = () => {
-  const itinID: string = "2";
+  const dummyItinData: ItineraryType = {
+    itinID: "1",
+    deptHour: "09:00",
+    arrHour: "14:00",
+    duration: 7,
+    deptCity: "Thessaloniki",
+    arrCity: "Athina",
+    deptDate: Date.now().toString(),
+    arrDate: Date.now().toString(),
+  };
+
   const { sendMessage, socket } = useWebSocket(
     process.env.REACT_APP_WS_ENDPOINT || "no key",
-    itinID
+    dummyItinData.itinID
   );
 
   const [tickets, setTickets] = useState<TicketType | undefined>(undefined);
@@ -21,10 +42,11 @@ const TicketScreen = () => {
   const { data, loading, error } = useFetch<TicketType>(
     process.env.REACT_APP_GET_BUS_ENDPOINT || "no key",
     "POST",
-    JSON.stringify({ id: itinID })
+    JSON.stringify({ id: dummyItinData.itinID })
   );
 
   useEffect(() => {
+    const itinID: string = dummyItinData.itinID;
     if (socket && socket.readyState === WebSocket.OPEN) {
       const message = JSON.stringify({
         type: "GET_SEATS_REAL_TIME",
@@ -32,7 +54,7 @@ const TicketScreen = () => {
       });
       sendMessage(message);
     }
-  }, [socket, itinID, sendMessage]);
+  }, [socket, dummyItinData, sendMessage]);
 
   useEffect(() => {
     const handleMessage = (message: string) => {
@@ -46,7 +68,7 @@ const TicketScreen = () => {
             if (!prevTickets) return undefined;
 
             const updatedBus = {
-              ...prevTickets.bus,
+              ...prevTickets.Bus,
               seats: updatedSeats.map((updatedSeat: SeatType) => {
                 return { ...updatedSeat };
               }),
@@ -96,7 +118,7 @@ const TicketScreen = () => {
   return (
     <div className="MainContainer">
       <BusLayout
-        seats={tickets.bus.seats}
+        seats={tickets.Bus.Seats}
         selectedSeats={selectedSeats}
         onClick={handleSelectedSeats}
       />
@@ -105,16 +127,7 @@ const TicketScreen = () => {
         <SeatTicketDetails
           selectedSeats={selectedSeats}
           initPrice={tickets.initPrice}
-          itinerary={{
-            itinID: itinID,
-            DeptHour: tickets.DeptHour,
-            ArrHour: tickets.ArrHour,
-            Duration: tickets.Duration,
-            DeptCity: tickets.DeptCity,
-            ArrCity: tickets.ArrCity,
-            DeptDate: "23/10/2023",
-            ArrDate: "23/10/2023",
-          }}
+          itinerary={dummyItinData}
         />
         <Map />
       </div>

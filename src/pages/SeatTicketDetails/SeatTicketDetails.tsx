@@ -13,17 +13,18 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
+type ItineraryType = {
+  itinID: string;
+  deptHour: string;
+  arrHour: string;
+  duration: number;
+  deptCity: string;
+  arrCity: string;
+  deptDate: string;
+  arrDate: string;
+};
 interface PropsType {
-  itinerary: {
-    itinID: string;
-    DeptHour: string;
-    ArrHour: string;
-    Duration: number;
-    DeptCity: string;
-    ArrCity: string;
-    DeptDate: string;
-    ArrDate: string;
-  };
+  itinerary: ItineraryType;
   initPrice: number;
   selectedSeats: number[];
 }
@@ -127,14 +128,14 @@ const SeatTicketDetails: React.FC<PropsType> = ({
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row" align="center">
-                    {itinerary.DeptHour}
+                    {itinerary.deptHour}
                   </TableCell>
-                  <TableCell align="center">{itinerary.ArrHour}</TableCell>
-                  <TableCell align="center">{itinerary.Duration}</TableCell>
-                  <TableCell align="center">{itinerary.DeptCity}</TableCell>
-                  <TableCell align="center">{itinerary.ArrCity}</TableCell>
-                  <TableCell align="center">{itinerary.DeptDate}</TableCell>
-                  <TableCell align="center">{itinerary.ArrDate}</TableCell>
+                  <TableCell align="center">{itinerary.arrHour}</TableCell>
+                  <TableCell align="center">{itinerary.duration}</TableCell>
+                  <TableCell align="center">{itinerary.deptCity}</TableCell>
+                  <TableCell align="center">{itinerary.arrCity}</TableCell>
+                  <TableCell align="center">{itinerary.deptDate}</TableCell>
+                  <TableCell align="center">{itinerary.arrDate}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
