@@ -6,6 +6,7 @@ import Overview from "./StepContent/Overview";
 import PaymentForm from "./StepContent/PaymentForm";
 import CountdownTimer from "../CountdownTimer/CountdownTimer";
 import useWebSocket from "../../hooks/useWebSocket";
+import useBeforeUnload from "../../hooks/useBeforeUnload";
 
 interface SeatFormData {
   firstName: string;
@@ -22,9 +23,6 @@ const steps = ["Seats Details", "Overview", "Payment/Completion"];
 const Checkout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { messages, sendMessage, socket } = useWebSocket(
-    process.env.REACT_APP_WS_ENDPOINT || "no key"
-  );
 
   const {
     expiryTime,
@@ -60,6 +58,10 @@ const Checkout: React.FC = () => {
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
   useEffect(() => {
+    console.log("Previous page:", location);
+  }, []);
+
+  useEffect(() => {
     const total = Object.values(formData).reduce(
       (acc, seat) => acc + seat.ticketPrice,
       0
@@ -80,6 +82,20 @@ const Checkout: React.FC = () => {
       navigate("/");
     }
   }, [timeLeft, setOpenSnackbar, navigate]);
+
+  useBeforeUnload(() => {
+    fetch(process.env.REACT_APP_PUT_BUS_ENDPOINT || "no key", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "PUT",
+      body: JSON.stringify({
+        itinID: itinID,
+        selectedSeats: selectedSeats,
+        lockType: "open",
+      }),
+    });
+  }, activeStep === 0);
 
   const handleInputChange = (
     seat: number,

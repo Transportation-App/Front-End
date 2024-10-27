@@ -27,8 +27,8 @@ const TicketScreen = () => {
     duration: 7,
     deptCity: "Thessaloniki",
     arrCity: "Athina",
-    deptDate: Date.now().toString(),
-    arrDate: Date.now().toString(),
+    deptDate: new Date(Date.now()).toLocaleDateString("en-GB"),
+    arrDate: new Date(Date.now()).toLocaleDateString("en-GB"),
   };
 
   const { sendMessage, socket } = useWebSocket(

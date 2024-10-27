@@ -1,9 +1,5 @@
 import { Button, CircularProgress, Box } from "@mui/material";
-import { useEffect, useState } from "react";
-import Completion from "./Completion";
-import { NavLink } from "react-router-dom";
-import { URL } from "url";
-import useFetch from "../../../hooks/useFetch";
+import { useState } from "react";
 
 type SeatFormData = {
   firstName: string;
@@ -27,8 +23,6 @@ const PaymentForm: React.FC<paymentInfo> = ({
   formData,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [isSucceeded, setIsSucceeded] = useState<boolean>(false);
-  const [url, setUrl] = useState<string>("");
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -55,7 +49,6 @@ const PaymentForm: React.FC<paymentInfo> = ({
 
       // Redirect to Stripe Checkout page
       window.location.href = url;
-      setUrl(url);
     } catch (error) {
       console.error("Error:", error);
       setLoading(false);

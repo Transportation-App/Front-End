@@ -8,6 +8,7 @@ import HomePage from "./pages/Home/HomePage";
 import Checkout from "./pages/Checkout/Checkout";
 import Layout from "./Layout/Layout";
 import Completion from "./pages/Checkout/StepContent/Completion";
+import Decline from "./pages/Checkout/StepContent/Decline";
 
 const ItineraryPage = () => {
   return (
@@ -23,6 +24,7 @@ const ItineraryPage = () => {
           <Route path="/bus" element={<TicketScreen />}></Route>
           <Route path="/checkout" element={<Checkout />}></Route>
           <Route path="/receipt/:sessionId" element={<Completion />}></Route>
+          <Route path="/decline/:sessionId" element={<Decline />}></Route>
           <Route path="/admin" element={<AdminPanel />}></Route>
           <Route path="*" element={<Navigate to={"/home"} />}></Route>
         </Routes>

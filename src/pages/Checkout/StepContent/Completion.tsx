@@ -43,7 +43,6 @@ const Completion: React.FC = () => {
     }
   }, [data]);
 
-  // Navigate to homepage if data fetch fails or receiptData is undefined
   useEffect(() => {
     if (!loading && (error || !data)) {
       navigate("/");
