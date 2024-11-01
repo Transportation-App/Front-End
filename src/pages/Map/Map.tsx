@@ -1,27 +1,32 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-routing-machine";
 import "leaflet/dist/leaflet.css";
+import useFetch from "../../hooks/useFetch";
 
-interface MapWithRoutingProps {
-  waypoints: [number, number][];
-}
+type CoordsType = {
+  Id: string;
+  Name: string;
+  "Lng / Lat": {
+    x: number;
+    y: number;
+  };
+};
 
-const waypointsData: [number, number][] = [
-  [40.5493, 21.4018],
-  [40.6103, 21.7482],
-  [40.6401, 22.9444],
-];
+const dummyData: { deptCity: string; arrCity: string } = {
+  deptCity: "Αθήνα",
+  arrCity: "Θεσσαλονίκη",
+};
 
-const RoutingPlan: React.FC<MapWithRoutingProps> = ({ waypoints }) => {
+const RoutingPlan: React.FC<{ coords: CoordsType[] }> = ({ coords }) => {
   const map = useMap();
 
   useEffect(() => {
-    if (!map) return;
+    if (!map || coords.length === 0) return;
 
-    const routingWaypoints = waypoints.map((coords) =>
-      L.latLng(coords[0], coords[1])
+    const routingWaypoints = coords.map((coord) =>
+      L.latLng(coord["Lng / Lat"].x, coord["Lng / Lat"].y)
     );
 
     const createMarker = (
@@ -68,15 +73,32 @@ const RoutingPlan: React.FC<MapWithRoutingProps> = ({ waypoints }) => {
     return () => {
       map.removeControl(routingControl);
     };
-  }, [map, waypoints]);
+  }, [map, coords]);
 
   return null;
 };
 
 const Map: React.FC = () => {
+  const [coords, setCoords] = useState<CoordsType[]>([]);
+  const { data, loading, error } = useFetch<CoordsType[]>(
+    process.env.REACT_APP_GET_COORDS_ENDPOINT || "no key",
+    "POST",
+    JSON.stringify(dummyData)
+  );
+
+  useEffect(() => {
+    if (data) {
+      setCoords(data);
+    }
+  }, [data, setCoords]);
+
+  if (loading) return <p>Loading map...</p>;
+  if (error) return <p>Error loading map data</p>;
+  if (!coords || coords.length === 0) return <p>No coordinates available</p>;
+
   return (
     <MapContainer
-      center={[40.6401, 22.9444]}
+      center={[coords[0]["Lng / Lat"].x, coords[0]["Lng / Lat"].y]}
       zoom={6}
       style={{
         height: "100%",
@@ -89,8 +111,7 @@ const Map: React.FC = () => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-
-      <RoutingPlan waypoints={waypointsData} />
+      <RoutingPlan coords={coords} />
     </MapContainer>
   );
 };
