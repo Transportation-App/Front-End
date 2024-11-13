@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import countries from "../../locales/gr/countries.json"
 import ChangeLang from "./LanguageChange";
 import { Alert, AlertColor, Autocomplete, Modal, Paper, Snackbar, TextField } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
