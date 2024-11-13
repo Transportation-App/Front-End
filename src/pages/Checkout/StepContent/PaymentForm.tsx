@@ -1,94 +1,72 @@
-import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { Button, CircularProgress, Box } from "@mui/material";
 import { useState } from "react";
-import Completion from "./Completion";
 
-const PaymentForm = ({ totalPrice }: { totalPrice: number }) => {
-  const stripe = useStripe();
-  const elements = useElements();
+type SeatFormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  ticketDiscount: number;
+  ticketType: string;
+  ticketPrice: number;
+};
+
+type paymentInfo = {
+  itinID: string;
+  totalPrice: number;
+  formData: Record<number, SeatFormData>;
+};
+
+const PaymentForm: React.FC<paymentInfo> = ({
+  itinID,
+  totalPrice,
+  formData,
+}) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [isSucceeded, setIsSucceeded] = useState<boolean>(false);
-  const cardElementOptions = {
-    style: {
-      base: {
-        color: "#32325d",
-        fontFamily: "'Helvetica Neue', Helvetica, sans-serif",
-        fontSmoothing: "antialiased",
-        fontSize: "16px",
-        letterSpacing: "0.025em",
-        lineHeight: "24px",
-        padding: "10px",
-        // border: "1px solid black",
-        // borderRadius: "4px",
-      },
-      invalid: {
-        color: "#fa755a",
-        iconColor: "#fa755a",
-      },
-      //   complete: {
-      //     color: "#b7f5d1",
-      //   },
-    },
-  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!stripe || !elements) {
-      return;
-    }
-
-    const cardElement = elements.getElement(CardElement);
 
     setLoading(true);
 
     try {
-      const res = await fetch(
+      const res: Response = await fetch(
         process.env.REACT_APP_STRIPE_PAYMENT_ENDPOINT || "no key",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ amount: totalPrice * 100 }), // Convert to cents for Stripe
+          body: JSON.stringify({
+            itinID: itinID,
+            totalPrice: (totalPrice * 100).toFixed(2),
+            formData: formData,
+          }),
         }
       );
-      const { clientSecret } = await res.json();
 
-      // Confirm the card payment
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement!,
-        },
-      });
+      const { url } = await res.json();
 
-      if (result.error) {
-        console.log(result.error.message);
-        setLoading(false);
-      } else if (result.paymentIntent?.status === "succeeded") {
-        setIsSucceeded(true);
-        setLoading(false);
-      }
+      // Redirect to Stripe Checkout page
+      window.location.href = url;
     } catch (error) {
-      console.error(error);
+      console.error("Error:", error);
       setLoading(false);
     }
   };
 
-  if (isSucceeded) {
-    return <Completion totalPrice={totalPrice} />;
-  }
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col w-[50%] border">
       <Box sx={{ my: 2, p: 2, width: "100%" }}>
-        <CardElement options={cardElementOptions} />
+        <p>Product: Your Product Name</p>
+        <p>Total: {totalPrice}€</p>
       </Box>
 
       <Button
         variant="contained"
         color="primary"
         type="submit"
-        disabled={!stripe || loading}
+        disabled={loading}
       >
         {loading ? <CircularProgress size={24} /> : `Pay ${totalPrice}€`}
       </Button>

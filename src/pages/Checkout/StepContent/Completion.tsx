@@ -1,13 +1,54 @@
 import { Box, Typography, Divider, Button, Paper } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+import useFetch from "../../../hooks/useFetch";
 
-type propsType = {
-  totalPrice: number;
+type SeatFormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  ticketDiscount: number;
+  ticketType: string;
+  ticketPrice: number;
 };
 
-const Completion: React.FC<propsType> = ({ totalPrice }) => {
+type paymentInfo = {
+  totalPrice: number;
+  formData: Record<number, SeatFormData>;
+};
+
+const Completion: React.FC = () => {
+  const navigate = useNavigate();
+  const { sessionId } = useParams<{ sessionId: string }>();
+
+  const [receiptData, setReceiptData] = useState<{
+    id: string;
+    totalPrice: number;
+  }>();
+
+  const { data, loading, error } = useFetch<{
+    id: string;
+    totalPrice: number;
+  }>(
+    process.env.REACT_APP_CACHE_GET_ENDPOINT || "no key",
+    "POST",
+    JSON.stringify({ sessionID: sessionId })
+  );
+
+  useEffect(() => {
+    if (data) {
+      setReceiptData(data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (!loading && (error || !data)) {
+      navigate("/");
+    }
+  }, [loading, error, data, navigate]);
+
   return (
     <Paper
       sx={{
@@ -26,8 +67,10 @@ const Completion: React.FC<propsType> = ({ totalPrice }) => {
         Payment Successful!
       </Typography>
       <Typography variant="body1" color="textSecondary">
-        Your payment of <strong>{totalPrice}€</strong> has been processed
-        successfully. A confirmation email has been sent to your inbox.
+        Your payment of{" "}
+        <strong>{(receiptData?.totalPrice as number) / 100}€</strong> has been
+        processed successfully. A confirmation email has been sent to your
+        inbox.
       </Typography>
 
       <Divider sx={{ my: 3 }} />
@@ -36,9 +79,11 @@ const Completion: React.FC<propsType> = ({ totalPrice }) => {
         <Typography variant="subtitle1" fontWeight="bold">
           Order Summary:
         </Typography>
-        <Typography variant="body2">Total Price: {totalPrice}€</Typography>
         <Typography variant="body2">
-          Transaction ID: #{Math.floor(Math.random() * 1000000000)}
+          Total Price: {(receiptData?.totalPrice as number) / 100}€
+        </Typography>
+        <Typography variant="body2">
+          Transaction ID: #{receiptData?.id}
         </Typography>
         <Typography variant="body2">
           Date: {new Date().toDateString()}
@@ -48,11 +93,7 @@ const Completion: React.FC<propsType> = ({ totalPrice }) => {
       <Divider sx={{ my: 3 }} />
 
       <NavLink to={"/"}>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
+        <Button variant="contained" color="primary" sx={{ mt: 2 }}>
           Go to Homepage
         </Button>
       </NavLink>

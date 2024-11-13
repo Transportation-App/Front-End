@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../../styles/tempTicketScreen.css";
 import {
   Box,
@@ -11,17 +11,20 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import { useState } from "react";
 
+type ItineraryType = {
+  itinID: string;
+  deptHour: string;
+  arrHour: string;
+  duration: number;
+  deptCity: string;
+  arrCity: string;
+  deptDate: string;
+  arrDate: string;
+};
 interface PropsType {
-  itinerary: {
-    DeptHour: string;
-    ArrHour: string;
-    Duration: number;
-    DeptCity: string;
-    ArrCity: string;
-    DeptDate: string;
-    ArrDate: string;
-  };
+  itinerary: ItineraryType;
   initPrice: number;
   selectedSeats: number[];
 }
@@ -31,6 +34,59 @@ const SeatTicketDetails: React.FC<PropsType> = ({
   selectedSeats,
   initPrice,
 }) => {
+  const [loadingUpdate, setLoadingUpdate] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
+  const onClickHandler = async (e: any) => {
+    try {
+      setLoadingUpdate(true);
+      const res = await fetch(
+        process.env.REACT_APP_PUT_BUS_ENDPOINT || "no key",
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "PUT",
+          body: JSON.stringify({
+            itinID: itinerary.itinID,
+            selectedSeats: selectedSeats,
+            lockType: "tempLocked",
+          }),
+        }
+      );
+
+      if (res.ok) {
+        const data: {
+          success: boolean;
+          message: string;
+          data: { updated: boolean } | null;
+        } = await res.json();
+
+        if (data.success) {
+          const expiryTime = Date.now() + 8 * 60 * 1000;
+
+          navigate("/checkout", {
+            state: {
+              expiryTime: expiryTime,
+              itinID: itinerary.itinID,
+              selectedSeats: selectedSeats,
+              initPrice: initPrice,
+            },
+          });
+        } else {
+          console.log("Something went wrong");
+        }
+      } else {
+        console.log("Something went wrong");
+      }
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setLoadingUpdate(false);
+    }
+  };
+
   return (
     <div className="seat-ticket-details">
       {!(selectedSeats.length > 0) ? (
@@ -72,14 +128,14 @@ const SeatTicketDetails: React.FC<PropsType> = ({
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row" align="center">
-                    {itinerary.DeptHour}
+                    {itinerary.deptHour}
                   </TableCell>
-                  <TableCell align="center">{itinerary.ArrHour}</TableCell>
-                  <TableCell align="center">{itinerary.Duration}</TableCell>
-                  <TableCell align="center">{itinerary.DeptCity}</TableCell>
-                  <TableCell align="center">{itinerary.ArrCity}</TableCell>
-                  <TableCell align="center">{itinerary.DeptDate}</TableCell>
-                  <TableCell align="center">{itinerary.ArrDate}</TableCell>
+                  <TableCell align="center">{itinerary.arrHour}</TableCell>
+                  <TableCell align="center">{itinerary.duration}</TableCell>
+                  <TableCell align="center">{itinerary.deptCity}</TableCell>
+                  <TableCell align="center">{itinerary.arrCity}</TableCell>
+                  <TableCell align="center">{itinerary.deptDate}</TableCell>
+                  <TableCell align="center">{itinerary.arrDate}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -124,19 +180,15 @@ const SeatTicketDetails: React.FC<PropsType> = ({
               </div>
             </div>
             <div className="flex items-end w-full justify-end gap-3">
-              <NavLink
-                to={"/Checkout"}
-                state={{ selectedSeats: selectedSeats, initPrice: initPrice }}
+              <Button
+                size="medium"
+                variant="contained"
+                className="submit-btn"
+                onClick={onClickHandler}
+                // disabled={!(selectedSeats.length > 0)}
               >
-                <Button
-                  size="medium"
-                  variant="contained"
-                  className="submit-btn"
-                  // disabled={!(selectedSeats.length > 0)}
-                >
-                  {"Book your seat!"}
-                </Button>
-              </NavLink>
+                {"Book your seat!"}
+              </Button>
             </div>
           </div>
         </>

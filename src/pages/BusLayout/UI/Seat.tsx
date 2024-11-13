@@ -2,14 +2,14 @@ import "../../../styles/tempTicketScreen.css";
 import { FormControlLabel, Checkbox } from "@mui/material";
 
 interface PropsType {
-  isRes: boolean;
+  status: string;
   count: number;
   selectedSeats: number[];
   onSeatChange: (updatedSeats: number[]) => void;
 }
 
 const Seat: React.FC<PropsType> = ({
-  isRes,
+  status,
   count,
   selectedSeats,
   onSeatChange,
@@ -30,6 +30,9 @@ const Seat: React.FC<PropsType> = ({
     }
   };
 
+  const isLocked = status === "locked";
+  const isTempLocked = status === "tempLocked";
+
   return (
     <FormControlLabel
       control={
@@ -39,11 +42,11 @@ const Seat: React.FC<PropsType> = ({
           value={seatNumber}
           sx={{ display: "none" }}
           checked={isChecked}
-          disabled={isRes}
+          disabled={isLocked || isTempLocked}
         />
       }
       label={seatNumber}
-      disabled={isRes}
+      disabled={isLocked || isTempLocked}
       sx={{
         margin: 0,
         padding: 0,
@@ -51,9 +54,12 @@ const Seat: React.FC<PropsType> = ({
         height: "44px",
         fontSize: "14px",
         fontWeight: "bold",
-        color: isRes ? "white" : isChecked ? "white" : "#000",
-        backgroundColor: isRes
+        ".MuiFormControlLabel-label.Mui-disabled": { color: "white" },
+        color: isChecked ? "white" : "#000",
+        backgroundColor: isLocked
           ? "red"
+          : isTempLocked
+          ? "orange"
           : isChecked
           ? "rgb(0, 169, 0)"
           : "#e0e0e0",
@@ -61,11 +67,13 @@ const Seat: React.FC<PropsType> = ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        cursor: isRes ? "not-allowed" : "pointer",
+        cursor: isLocked || isTempLocked ? "not-allowed !important" : "pointer",
         transition: "background-color 0.3s ease",
         "&:hover": {
-          backgroundColor: isRes
+          backgroundColor: isLocked
             ? "red"
+            : isTempLocked
+            ? "orange"
             : isChecked
             ? "rgb(0, 169, 0)"
             : "#737373",
@@ -73,7 +81,7 @@ const Seat: React.FC<PropsType> = ({
         },
         "&:disabled": {
           color: "white",
-          backgroundColor: "red",
+          backgroundColor: isLocked ? "red" : isTempLocked ? "orange" : "",
         },
       }}
       htmlFor={String(seatNumber)}

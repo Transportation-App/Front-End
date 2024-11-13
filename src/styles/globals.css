@@ -33,3 +33,7 @@ body {
   width: 0;
   background-color: transparent;
 }
+
+.leaflet-routing-container {
+  display: none !important;
+}

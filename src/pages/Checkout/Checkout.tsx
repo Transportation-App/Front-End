@@ -4,7 +4,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import SeatsDetails from "./StepContent/SeatsDetails";
 import Overview from "./StepContent/Overview";
 import PaymentForm from "./StepContent/PaymentForm";
-import StripeProvider from "../../Provider/StripeProvider";
+import CountdownTimer from "../CountdownTimer/CountdownTimer";
+import useWebSocket from "../../hooks/useWebSocket";
+import useBeforeUnload from "../../hooks/useBeforeUnload";
 
 interface SeatFormData {
   firstName: string;
@@ -22,11 +24,22 @@ const Checkout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { selectedSeats = [], initPrice } =
-    (location.state as { selectedSeats: number[]; initPrice: number }) || {};
+  const {
+    expiryTime,
+    itinID,
+    selectedSeats = [],
+    initPrice,
+  } = (location.state as {
+    expiryTime: number | null;
+    itinID: string;
+    selectedSeats: number[];
+    initPrice: number;
+  }) || {};
 
+  const timeLeft: number | null = expiryTime!! - Date.now();
   const [activeStep, setActiveStep] = useState(0);
-
+  const [open, setOpen] = useState<boolean>(true);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [formData, setFormData] = useState<Record<number, SeatFormData>>(
     selectedSeats.reduce((acc, seat) => {
       acc[seat] = {
@@ -45,6 +58,10 @@ const Checkout: React.FC = () => {
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
   useEffect(() => {
+    console.log("Previous page:", location);
+  }, []);
+
+  useEffect(() => {
     const total = Object.values(formData).reduce(
       (acc, seat) => acc + seat.ticketPrice,
       0
@@ -54,9 +71,31 @@ const Checkout: React.FC = () => {
 
   useEffect(() => {
     if (selectedSeats.length === 0) {
-      navigate("/Bus");
+      navigate("/");
     }
   }, [selectedSeats, navigate]);
+
+  useEffect(() => {
+    if (timeLeft > 0) {
+      setOpenSnackbar(true);
+    } else {
+      navigate("/");
+    }
+  }, [timeLeft, setOpenSnackbar, navigate]);
+
+  useBeforeUnload(() => {
+    fetch(process.env.REACT_APP_PUT_BUS_ENDPOINT || "no key", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "PUT",
+      body: JSON.stringify({
+        itinID: itinID,
+        selectedSeats: selectedSeats,
+        lockType: "open",
+      }),
+    });
+  }, activeStep === 0);
 
   const handleInputChange = (
     seat: number,
@@ -105,6 +144,37 @@ const Checkout: React.FC = () => {
     });
   };
 
+  const handleClose = async () => {
+    setOpen(false);
+    const res = await fetch(
+      process.env.REACT_APP_PUT_BUS_ENDPOINT || "no key",
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify({
+          itinID: itinID,
+          selectedSeats: selectedSeats,
+          lockType: "open",
+        }),
+      }
+    );
+
+    if (res.ok) {
+      const data: {
+        success: boolean;
+        message: string;
+        data: { updated: boolean } | null;
+      } = await res.json();
+
+      if (data.success) {
+        alert("Reservation expired!");
+        navigate("/");
+      }
+    }
+  };
+
   const StepContent: { [step: number]: JSX.Element } = {
     0: (
       <SeatsDetails
@@ -116,11 +186,17 @@ const Checkout: React.FC = () => {
     ),
     1: <Overview formData={formData} />,
     2: (
-      <StripeProvider>
-        <PaymentForm totalPrice={totalPrice} />
-      </StripeProvider>
+      <PaymentForm
+        itinID={itinID}
+        totalPrice={totalPrice}
+        formData={formData}
+      />
     ),
   };
+
+  if (timeLeft === null) {
+    return <>loading...</>;
+  }
 
   return (
     <div className="flex flex-col gap-2 h-full w-full px-[100px]">
@@ -135,7 +211,9 @@ const Checkout: React.FC = () => {
           }}
         >
           {steps.map((label) => (
-            <Step key={label}>{<StepLabel>{label}</StepLabel>}</Step>
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
           ))}
         </Stepper>
         <Button
@@ -154,6 +232,14 @@ const Checkout: React.FC = () => {
       <section className="flex justify-evenly items-center flex-col h-[80vh] w-full ">
         {StepContent[activeStep]}
       </section>
+
+      {openSnackbar && timeLeft > 0 && (
+        <CountdownTimer
+          expiryTime={Date.now() + timeLeft}
+          open={open}
+          handleClose={handleClose}
+        />
+      )}
     </div>
   );
 };

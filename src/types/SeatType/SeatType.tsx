@@ -1,5 +1,5 @@
 export type SeatType = {
-    number: number;
-    // type: string;
-    isRes: boolean;
+  number: number;
+  // type: string;
+  status: string;
 };

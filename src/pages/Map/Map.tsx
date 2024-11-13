@@ -1,16 +1,118 @@
-import "../../styles/tempTicketScreen.css";
+import React, { useEffect, useState } from "react";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet-routing-machine";
+import "leaflet/dist/leaflet.css";
+import useFetch from "../../hooks/useFetch";
 
-const Map = () => {
+type CoordsType = {
+  Id: string;
+  Name: string;
+  "Lng / Lat": {
+    x: number;
+    y: number;
+  };
+};
+
+const dummyData: { deptCity: string; arrCity: string } = {
+  deptCity: "Αθήνα",
+  arrCity: "Θεσσαλονίκη",
+};
+
+const RoutingPlan: React.FC<{ coords: CoordsType[] }> = ({ coords }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || coords.length === 0) return;
+
+    const routingWaypoints = coords.map((coord) =>
+      L.latLng(coord["Lng / Lat"].x, coord["Lng / Lat"].y)
+    );
+
+    const createMarker = (
+      waypointIndex: number,
+      waypoint: L.Routing.Waypoint,
+      numberOfWaypoints: number
+    ) => {
+      const marker = L.marker(waypoint.latLng);
+
+      const popupContent = `Location: ${waypoint.latLng.lat.toFixed(
+        4
+      )}, ${waypoint.latLng.lng.toFixed(4)}`;
+      marker.bindPopup(popupContent);
+
+      return marker;
+    };
+
+    const plan = L.Routing.plan(routingWaypoints, {
+      draggableWaypoints: false,
+      addWaypoints: false,
+      routeWhileDragging: false,
+      createMarker,
+    });
+
+    const lineOptions = {
+      extendToWaypoints: false,
+      addWaypoints: false,
+      missingRouteTolerance: 5,
+      styles: [
+        {
+          color: "blue",
+          weight: 5,
+        },
+      ],
+    };
+
+    const routingControl = L.Routing.control({
+      plan,
+      routeWhileDragging: false,
+      show: false,
+      lineOptions,
+    }).addTo(map);
+
+    return () => {
+      map.removeControl(routingControl);
+    };
+  }, [map, coords]);
+
+  return null;
+};
+
+const Map: React.FC = () => {
+  const [coords, setCoords] = useState<CoordsType[]>([]);
+  const { data, loading, error } = useFetch<CoordsType[]>(
+    process.env.REACT_APP_GET_COORDS_ENDPOINT || "no key",
+    "POST",
+    JSON.stringify(dummyData)
+  );
+
+  useEffect(() => {
+    if (data) {
+      setCoords(data);
+    }
+  }, [data, setCoords]);
+
+  if (loading) return <p>Loading map...</p>;
+  if (error) return <p>Error loading map data</p>;
+  if (!coords || coords.length === 0) return <p>No coordinates available</p>;
+
   return (
-    <div className="map">
-      <iframe
-        src="https://www.google.com/maps/embed?pb=!1m34!1m12!1m3!1d1580482.813689821!2d21.825563270270717!3d39.31363229525876!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m19!3e0!4m5!1s0x14a838f41428e0ed%3A0x9bae715b8d574a9!2sThessaloniki!3m2!1d40.6400629!2d22.944419099999998!4m5!1s0x135f45553b3f43f1%3A0x5344ba71e6c6fec7!2zzpvOsc68zq_OsQ!3m2!1d38.8997433!2d22.4337387!4m5!1s0x14a1bd1f067043f1%3A0x2736354576668ddd!2zzpHOuM6uzr3OsQ!3m2!1d37.9838096!2d23.727538799999998!5e0!3m2!1sel!2sgr!4v1727456770530!5m2!1sel!2sgr"
-        width="100%"
-        height="100%"
-        style={{ border: 0, borderRadius: "0.575rem" }}
-        loading="lazy"
-      ></iframe>
-    </div>
+    <MapContainer
+      center={[coords[0]["Lng / Lat"].x, coords[0]["Lng / Lat"].y]}
+      zoom={6}
+      style={{
+        height: "100%",
+        width: "50%",
+        borderRadius: "0.575rem",
+        border: 0,
+      }}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      <RoutingPlan coords={coords} />
+    </MapContainer>
   );
 };
 

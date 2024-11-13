@@ -24,7 +24,7 @@ const BusLayout: React.FC<PropsType> = ({ seats, selectedSeats, onClick }) => {
     for (let i = 0; i < seatsPerRow; i++) {
       tempSeats.push(
         <Seat
-          isRes={seats[count].isRes}
+          status={seats[count].status}
           key={count}
           count={count}
           selectedSeats={selectedSeats}
@@ -49,7 +49,7 @@ const BusLayout: React.FC<PropsType> = ({ seats, selectedSeats, onClick }) => {
             <div key={i} className="aisle"></div>
           ) : (
             <Seat
-              isRes={seats[count].isRes}
+              status={seats[count].status}
               count={count++}
               selectedSeats={selectedSeats}
               onSeatChange={handleSeatChange}
