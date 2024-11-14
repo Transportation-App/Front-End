@@ -7,132 +7,153 @@ import "../../styles/tempTicketScreen.css";
 import useFetch from "../../hooks/useFetch";
 import useWebSocket from "../../hooks/useWebSocket";
 import { SeatType } from "../../types/SeatType";
+import { CircularProgress } from "@mui/material";
+import CustomModal from "../../UI/CustomModal";
 
 type ItineraryType = {
-  itinID: string;
-  deptHour: string;
-  arrHour: string;
-  duration: number;
-  deptCity: string;
-  arrCity: string;
-  deptDate: string;
-  arrDate: string;
+	itinID: string;
+	deptHour: string;
+	arrHour: string;
+	duration: number;
+	deptCity: string;
+	arrCity: string;
+	deptDate: string;
+	arrDate: string;
 };
 
 const TicketScreen = () => {
-  const dummyItinData: ItineraryType = {
-    itinID: "1",
-    deptHour: "09:00",
-    arrHour: "14:00",
-    duration: 7,
-    deptCity: "Thessaloniki",
-    arrCity: "Athina",
-    deptDate: new Date(Date.now()).toLocaleDateString("en-GB"),
-    arrDate: new Date(Date.now()).toLocaleDateString("en-GB"),
-  };
+	const dummyItinData: ItineraryType = {
+		itinID: "1",
+		deptHour: "09:00",
+		arrHour: "14:00",
+		duration: 7,
+		deptCity: "Thessaloniki",
+		arrCity: "Athina",
+		deptDate: new Date(Date.now()).toLocaleDateString("en-GB"),
+		arrDate: new Date(Date.now()).toLocaleDateString("en-GB"),
+	};
 
-  const { sendMessage, socket } = useWebSocket(
-    process.env.REACT_APP_WS_ENDPOINT || "no key",
-    dummyItinData.itinID
-  );
+	const { sendMessage, socket } = useWebSocket(
+		process.env.REACT_APP_WS_ENDPOINT || "no key",
+		dummyItinData.itinID
+	);
 
-  const [tickets, setTickets] = useState<TicketType | undefined>(undefined);
-  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+	const [tickets, setTickets] = useState<TicketType | undefined>(undefined);
+	const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
 
-  const { data, loading, error } = useFetch<TicketType>(
-    process.env.REACT_APP_GET_BUS_ENDPOINT || "no key",
-    "POST",
-    JSON.stringify({ id: dummyItinData.itinID })
-  );
+	const { data, loading, error } = useFetch<TicketType>(
+		process.env.REACT_APP_GET_BUS_ENDPOINT || "no key",
+		"POST",
+		JSON.stringify({ id: dummyItinData.itinID })
+	);
 
-  useEffect(() => {
-    const itinID: string = dummyItinData.itinID;
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      const message = JSON.stringify({
-        type: "GET_SEATS_REAL_TIME",
-        data: { itinID, selectedSeats: [] },
-      });
-      sendMessage(message);
-    }
-  }, [socket, dummyItinData, sendMessage]);
+	useEffect(() => {
+		const itinID: string = dummyItinData.itinID;
+		if (socket && socket.readyState === WebSocket.OPEN) {
+			const message = JSON.stringify({
+				type: "GET_SEATS_REAL_TIME",
+				data: { itinID, selectedSeats: [] },
+			});
+			sendMessage(message);
+		}
+	}, [socket, dummyItinData, sendMessage]);
 
-  useEffect(() => {
-    const handleMessage = (message: string) => {
-      try {
-        const parsedMessage = JSON.parse(message);
+	useEffect(() => {
+		const handleMessage = (message: string) => {
+			try {
+				const parsedMessage = JSON.parse(message);
 
-        if (parsedMessage.type === "SEATS_UPDATE") {
-          const updatedSeats = parsedMessage.data;
+				if (parsedMessage.type === "SEATS_UPDATE") {
+					const updatedSeats = parsedMessage.data;
 
-          setTickets((prevTickets) => {
-            if (!prevTickets) return undefined;
+					setTickets((prevTickets) => {
+						if (!prevTickets) return undefined;
 
-            const updatedBus = {
-              ...prevTickets.Bus,
-              seats: updatedSeats.map((updatedSeat: SeatType) => {
-                return { ...updatedSeat };
-              }),
-            };
+						const updatedBus = {
+							...prevTickets.Bus,
+							seats: updatedSeats.map((updatedSeat: SeatType) => {
+								return { ...updatedSeat };
+							}),
+						};
 
-            return {
-              ...prevTickets,
-              bus: updatedBus,
-            };
-          });
-        }
-      } catch (error) {
-        console.error("Error parsing incoming message:", error);
-      }
-    };
+						return {
+							...prevTickets,
+							bus: updatedBus,
+						};
+					});
+				}
+			} catch (error) {
+				console.error("Error parsing incoming message:", error);
+			}
+		};
 
-    if (socket) {
-      socket.addEventListener("message", (event) => handleMessage(event.data));
-    }
-    return () => {
-      if (socket) {
-        socket.removeEventListener("message", (event) =>
-          handleMessage(event.data)
-        );
-      }
-    };
-  }, [socket]);
+		if (socket) {
+			socket.addEventListener("message", (event) => handleMessage(event.data));
+		}
+		return () => {
+			if (socket) {
+				socket.removeEventListener("message", (event) =>
+					handleMessage(event.data)
+				);
+			}
+		};
+	}, [socket]);
 
-  useEffect(() => {
-    if (data) {
-      setTickets(data);
-    }
-  }, [data]);
+	useEffect(() => {
+		if (data) {
+			setTickets(data);
+		}
+	}, [data]);
 
-  const handleSelectedSeats = (updatedSeats: number[]) => {
-    setSelectedSeats(updatedSeats);
-  };
+	const handleSelectedSeats = (updatedSeats: number[]) => {
+		setSelectedSeats(updatedSeats);
+	};
 
-  if (loading) {
-    return <>Loading...</>;
-  }
+	const [displayError, setDisplayError] = useState<boolean>(false);
+	const closeErrorModal = () => {
+		setDisplayError(false);
+	};
+	const openErrorModal = () => {
+		setDisplayError(true);
+	};
+	useEffect(() => {
+		if (error) openErrorModal();
+	}, [error]);
 
-  if (!tickets) {
-    return <>No ticket data available.</>;
-  }
+	if (loading) {
+		return <CircularProgress />;
+	}
 
-  return (
-    <div className="MainContainer">
-      <BusLayout
-        seats={tickets.Bus.Seats}
-        selectedSeats={selectedSeats}
-        onClick={handleSelectedSeats}
-      />
+	if (!tickets) {
+		console.log(error);
+		return (
+			<CustomModal
+				open={displayError}
+				handleClose={closeErrorModal}
+				title={error?.name as string}
+				description={error?.message as string}
+			/>
+		);
+	}
 
-      <div className="ticketMap">
-        <SeatTicketDetails
-          selectedSeats={selectedSeats}
-          initPrice={tickets.initPrice}
-          itinerary={dummyItinData}
-        />
-        <Map />
-      </div>
-    </div>
-  );
+	return (
+		<div className="MainContainer">
+			<BusLayout
+				seats={tickets.Bus.Seats}
+				selectedSeats={selectedSeats}
+				onClick={handleSelectedSeats}
+			/>
+
+			<div className="ticketMap">
+				<SeatTicketDetails
+					selectedSeats={selectedSeats}
+					initPrice={tickets.initPrice}
+					itinerary={dummyItinData}
+				/>
+				<Map />
+			</div>
+		</div>
+	);
 };
 
 export default TicketScreen;

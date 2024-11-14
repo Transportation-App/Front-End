@@ -16,11 +16,11 @@ const ItineraryPage = () => {
 		<>
 			<Layout>
 				<Routes>
-					<Route path="/" element={<LoginPage />}></Route>
+					{/* <Route path="/" element={<LoginPage />}></Route> */}
 					<Route path="/home" element={<HomePage />} index></Route>
 					<Route
-						path="/Itinerary"
-						element={<ItineraryList className="w-[80%] overflow-y-auto" />}
+						path="/itineraries"
+						element={<ItineraryList className="w-[80%] h-full" />}
 					></Route>
 					<Route path="/bus" element={<TicketScreen />}></Route>
 					<Route path="/checkout" element={<Checkout />}></Route>

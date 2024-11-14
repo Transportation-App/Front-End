@@ -1,61 +1,54 @@
-import React, { useEffect, useState } from 'react';
-import { ItineraryType } from "../../../types/ItineraryType";
+import React, { useEffect, useState } from "react";
 import ListItem from "./ListItem/ListItem";
+import useFetch from "../../../hooks/useFetch";
+import { ItineraryDBType } from "../../../types/ItineraryType/ItineraryType";
+import CircularProgress from "@mui/material/CircularProgress";
+import CustomModal from "../../../UI/CustomModal";
 
-interface PropsType  {
-  className?: string;
-  // itineraries: ItineraryType[];
-};
+interface PropsType {
+	className?: string;
+	// itineraries: ItineraryType[];
+}
 
 const ItineraryList = (props: PropsType) => {
-  const [fetchedData, setFetchedData] = useState<ItineraryType[]>([]);
-  const [error, setError] = useState<string | null>(null);
+	const { data, loading, error } = useFetch<ItineraryDBType[]>(
+		"http://localhost:3000/api/itineraries/full",
+		"GET"
+	);
+	const [displayError, setDisplayError] = useState<boolean>(false);
+	const closeErrorModal = () => {
+		setDisplayError(false);
+	};
+	const openErrorModal = () => {
+		setDisplayError(true);
+	};
+	useEffect(() => {
+		if (error) openErrorModal();
+	}, [error]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/Itinerary/retrieve', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+	if (loading) return <CircularProgress />;
+	if (error)
+		return (
+			<CustomModal
+				open={displayError}
+				handleClose={closeErrorModal}
+				title={error?.message as string}
+				description={error?.cause as string}
+			/>
+		);
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok ' + response.statusText);
-        }
-
-        const data: ItineraryType[] = await response.json();
-        setFetchedData(data);
-      } catch (error) {
-        console.error('There has been a problem with your fetch operation:', error);
-        setError('Error fetching data');
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (fetchedData.length === 0) {
-    return <div>No data found</div>;
-  }
-  console.log(fetchedData)
-  return (
-    <ul className={props.className}>
-      {Object.entries(fetchedData).map(([key, itinerary], index) => (
-        <ListItem
-          key={key} // Using the key from the object as the React key
-          className="flex flex-col justify-center items-center"
-          itinerary={itinerary as ItineraryType} // Casting itinerary to ItineraryType
-        />
-      ))}
-    </ul>
-  );
-  
-}
+	return (
+		<ul className={props.className}>
+			{data &&
+				data.map((itinerary) => (
+					<ListItem
+						key={itinerary.Id} // Using the key from the object as the React key
+						className="flex flex-col justify-center items-center"
+						itinerary={itinerary} // Casting itinerary to ItineraryType
+					/>
+				))}
+		</ul>
+	);
+};
 
 export default ItineraryList;
